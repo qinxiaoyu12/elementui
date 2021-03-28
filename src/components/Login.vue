@@ -1,9 +1,26 @@
 <template>
     <div class="login">
+      <!--头像区域-->
         <div class="login_box">
             <div class="avatar_box">
                 <img src="../assets/img/logo.png">
             </div>
+          <!--登录表单区域-->
+          <el-form class="login_from">
+            <!--用户名-->
+            <el-form-item>
+              <el-input ></el-input>
+            </el-form-item>
+            <!--密码-->
+            <el-form-item>
+              <el-input ></el-input>
+            </el-form-item>
+            <!--按钮区域-->
+            <el-form-item class="button">
+              <el-button type="primary">登录</el-button>
+              <el-button type="info">重置</el-button>
+            </el-form-item>
+          </el-form>
         </div>
     </div>
 </template>
@@ -49,5 +66,18 @@
         height: 100%;
         border-radius: 50%;
         background-color: #eeeeee;
+    }
+
+    .button {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .login_from {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      padding: 0 20px;
+      box-sizing: border-box;
     }
 </style>
