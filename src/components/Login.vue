@@ -51,8 +51,13 @@
                 this.$refs.loginFormReset.resetFields();
             },
             loginCheck() {
-                this.$refs.loginFormReset.validate(valid => {
-                    console.log(valid);
+                this.$refs.loginFormReset.validate(async valid => {
+                    // console.log(valid);
+                  if(!valid) return;
+                  const { data: res } = await this.$http.post('login', this.loginFrom);
+                  console.log(res);
+                  if(res.meta.status !== 200) return console.log('登陆失败')
+                  console.log('登录成功');
                 })
             }
         }
