@@ -6,19 +6,19 @@
                 <img src="../assets/img/logo.png">
             </div>
           <!--登录表单区域-->
-          <el-form class="login_from">
+          <el-form class="login_from" :model="loginFrom" :rules="loginFormRules" ref="loginFormReset">
             <!--用户名-->
-            <el-form-item>
-              <el-input ></el-input>
+            <el-form-item prop="username">
+              <el-input  prefix-icon="iconfont icon-user" v-model="loginFrom.username"></el-input>
             </el-form-item>
             <!--密码-->
-            <el-form-item>
-              <el-input ></el-input>
+            <el-form-item prop="password">
+              <el-input  prefix-icon="iconfont icon-3702mima" v-model="loginFrom.password" type="password"></el-input>
             </el-form-item>
             <!--按钮区域-->
             <el-form-item class="button">
-              <el-button type="primary">登录</el-button>
-              <el-button type="info">重置</el-button>
+              <el-button type="primary" @click="loginCheck">登录</el-button>
+              <el-button type="info" @click="resetFrom">重置</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -27,7 +27,35 @@
 
 <script>
     export default {
-        name: "Login"
+        name: "Login",
+        data() {
+            return {
+                loginFrom:{
+                    username:'zs1',
+                    password:'123456'
+                },
+                loginFormRules:{
+                    username: [
+                        { required: true, message:'请输入名字', trigger: 'blur'},
+                        { min: 3, max: 10, message: '长度在3到10个字符', trigger: 'blur'}
+                    ],
+                    password: [
+                        { required: true, message:'请输入登录密码', trigger: 'blur'},
+                        { min: 6, max: 15, message: '长度在6到15个字符', trigger: 'blur'}
+                    ]
+                }
+            }
+        },
+        methods: {
+            resetFrom() {
+                this.$refs.loginFormReset.resetFields();
+            },
+            loginCheck() {
+                this.$refs.loginFormReset.validate(valid => {
+                    console.log(valid);
+                })
+            }
+        }
     }
 </script>
 
