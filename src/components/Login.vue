@@ -31,7 +31,7 @@
         data() {
             return {
                 loginFrom:{
-                    username:'zs1',
+                    username:'admin',
                     password:'123456'
                 },
                 loginFormRules:{
@@ -56,8 +56,8 @@
                   if(!valid) return;
                   const { data: res } = await this.$API.wsDemo();
                   console.log(res);
-                  if(res.meta.status !== 200) return console.log('登陆失败')
-                  console.log('登录成功');
+                  if(res.meta.status !== 200) return this.$message.error('登录失败')
+                  this.$message.success('登录成功');
                 })
             }
         }
