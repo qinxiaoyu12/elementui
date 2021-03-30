@@ -26,6 +26,8 @@
 </template>
 
 <script>
+    import router from "@/router";
+
     export default {
         name: "Login",
         data() {
@@ -54,11 +56,15 @@
                 this.$refs.loginFormReset.validate(async valid => {
                     // console.log(valid);
                   if(!valid) return;
-                  const { data: res } = await this.$API.wsDemo();
+                  const { data: res } = await this.$axios.post('login', this.loginFrom);
                   console.log(res);
                   if(res.meta.status !== 200) return this.$message.error('登录失败')
                   this.$message.success('登录成功');
-                })
+                  //保存token到sessionStorage
+                  window.sessionStorage.setItem('token', res.data.token);
+                  //登录并跳转到home界面
+                  await this.$router.push('/home');
+                });
             }
         }
     }

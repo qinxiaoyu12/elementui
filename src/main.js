@@ -9,9 +9,10 @@ import axios from 'axios'
 
 Vue.config.productionTip = false;
 
-import API from "./request/api";
+// import API from "./request/api";
 Vue.prototype.$axios = axios;
-Vue.prototype.$API = API;
+axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
+// Vue.prototype.$API = API;
 
 Vue.use(ElementUI);
 
