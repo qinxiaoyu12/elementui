@@ -11,20 +11,19 @@
     <!--页面主体区域-->
     <el-container>
       <!--侧边栏-->
-      <el-aside width="200px" class="home_aside">
-        <el-menu class="el-menu-vertical-demo" background-color="#313743" text-color="#fff"
-                 active-text-color="#409EFF" :default-active="activeName"  @select="handleSelect" >
+      <el-aside :width="activeCollapse ? '64px' : '200px'" class="home_aside">
+        <div class="toggle" @click="toggleCollapse">|||</div>
+        <el-menu background-color="#313743" text-color="#fff" class="home_menu"
+                 active-text-color="#409EFF" :unique-opened="true" :collapse="activeCollapse" :collapse-transition="false">
           <el-submenu :index="item.id + ''" v-for="item in leftMenuList" :key="item.id">
             <template slot="title">
               <i class="el-icon-location"></i>
               <span>{{item.authName}}</span>
             </template>
-            <el-menu-item-group :index="menuItem.id + ''"  v-for="menuItem in item.children" :key="menuItem.id">
-              <el-menu-item>
+              <el-menu-item :index="menuItem.id + ''"  v-for="menuItem in item.children" :key="menuItem.id">
                 <i class="el-icon-menu"></i>
                 <span slot="title">{{menuItem.authName}}</span>
               </el-menu-item>
-            </el-menu-item-group>
           </el-submenu>
         </el-menu>
       </el-aside>
@@ -40,7 +39,8 @@ export default {
   data() {
     return {
       leftMenuList:[],
-      activeName:''
+      activeName:'',
+      activeCollapse:false,
     }
   },
   created() {
@@ -60,8 +60,8 @@ export default {
       this.leftMenuList = res.data;
       console.log(this.leftMenuList);
     },
-    handleSelect(index, keyPath) {
-      this.activeName = index + ''
+    toggleCollapse() {
+      this.activeCollapse = !this.activeCollapse;
     }
   }
 }
@@ -102,5 +102,19 @@ export default {
   .header_left {
     display: flex;
     align-items: center;
+  }
+
+  .home_menu {
+    border-right: none;
+  }
+
+  .toggle {
+    background-color: #4A5064;
+    color: #ffffff;
+    letter-spacing: 0.2em;
+    text-align: center;
+    line-height: 24px;
+    font-size: 10px;
+    cursor: pointer;
   }
 </style>
