@@ -12,11 +12,7 @@
     <el-container>
       <!--侧边栏-->
       <el-aside width="200px" class="home_aside">
-        <el-menu
-            class="el-menu-vertical-demo"
-            background-color="#313743"
-            text-color="#fff"
-            >
+        <el-menu class="el-menu-vertical-demo" background-color="#313743" text-color="#fff">
           <el-submenu index="1">
             <template slot="title">
               <i class="el-icon-location"></i>
@@ -40,10 +36,27 @@
 <script>
 export default {
   name: "home",
+  data() {
+    return {
+      leftMenuList:[]
+    }
+  },
+  created() {
+    this.getMenuList()
+  },
   methods: {
     logOut() {
       window.sessionStorage.clear();
       this.$router.push('/login');
+    },
+    //得到home界面左侧的菜单列表数据
+    async getMenuList() {
+      //get请求返回的是一个Promise类型 需要加async和await使函数更好进行
+      const {data: res} = await this.$axios.get('menus');
+      // console.log(res)
+      if (res.meta.status !== 200) return this.$message.error(res.meta.msg);
+      this.leftMenuList = res.data;
+      // console.log(this.leftMenuList);
     }
   }
 }
@@ -60,11 +73,11 @@ export default {
     align-items: center;
     padding-left: 0;
   }
-  
+
   .home_aside {
     background-color: #313743;
   }
-  
+
   .home_main {
     background-color: #eaedf1
   }
