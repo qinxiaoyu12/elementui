@@ -12,16 +12,17 @@
     <el-container>
       <!--侧边栏-->
       <el-aside width="200px" class="home_aside">
-        <el-menu class="el-menu-vertical-demo" background-color="#313743" text-color="#fff">
-          <el-submenu index="1">
+        <el-menu class="el-menu-vertical-demo" background-color="#313743" text-color="#fff"
+                 active-text-color="#409EFF" :default-active="activeName"  @select="handleSelect" >
+          <el-submenu :index="item.id + ''" v-for="item in leftMenuList" :key="item.id">
             <template slot="title">
               <i class="el-icon-location"></i>
-              <span>导航一</span>
+              <span>{{item.authName}}</span>
             </template>
-            <el-menu-item-group>
-              <el-menu-item index="2">
+            <el-menu-item-group :index="menuItem.id + ''"  v-for="menuItem in item.children" :key="menuItem.id">
+              <el-menu-item>
                 <i class="el-icon-menu"></i>
-                <span slot="title">导航二</span>
+                <span slot="title">{{menuItem.authName}}</span>
               </el-menu-item>
             </el-menu-item-group>
           </el-submenu>
@@ -38,7 +39,8 @@ export default {
   name: "home",
   data() {
     return {
-      leftMenuList:[]
+      leftMenuList:[],
+      activeName:''
     }
   },
   created() {
@@ -56,7 +58,10 @@ export default {
       // console.log(res)
       if (res.meta.status !== 200) return this.$message.error(res.meta.msg);
       this.leftMenuList = res.data;
-      // console.log(this.leftMenuList);
+      console.log(this.leftMenuList);
+    },
+    handleSelect(index, keyPath) {
+      this.activeName = index + ''
     }
   }
 }
