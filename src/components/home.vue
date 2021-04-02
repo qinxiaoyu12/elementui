@@ -17,7 +17,7 @@
                  active-text-color="#409EFF" :unique-opened="true" :collapse="activeCollapse" :collapse-transition="false">
           <el-submenu :index="item.id + ''" v-for="item in leftMenuList" :key="item.id">
             <template slot="title">
-              <i class="el-icon-location"></i>
+              <i :class="elIcon[item.id]" style="margin-right: 10px;"></i>
               <span>{{item.authName}}</span>
             </template>
               <el-menu-item :index="menuItem.id + ''"  v-for="menuItem in item.children" :key="menuItem.id">
@@ -28,7 +28,9 @@
         </el-menu>
       </el-aside>
       <!--右侧内容主体-->
-      <el-main class="home_main">Main</el-main>
+      <el-main class="home_main">
+        <router-view></router-view>
+      </el-main>
     </el-container>
   </el-container>
 </template>
@@ -41,6 +43,14 @@ export default {
       leftMenuList:[],
       activeName:'',
       activeCollapse:false,
+      elIcon: {
+        '125': 'iconfont icon-user',
+        '103': 'iconfont icon-3702mima',
+        '101': 'iconfont icon-shangpin',
+        '102': 'iconfont icon-danju',
+        '145': 'iconfont icon-baobiao'
+      }
+
     }
   },
   created() {
