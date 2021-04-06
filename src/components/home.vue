@@ -18,7 +18,7 @@
                  :collapse="activeCollapse" :collapse-transition="false" router :default-active="activePath">
           <el-submenu :index="item.id + ''" v-for="item in leftMenuList" :key="item.id">
             <template slot="title">
-              <i class="el-icon-location"></i>
+              <i :class="elIcon[item.id]" style="margin-right: 10px;"></i>
               <span>{{item.authName}}</span>
             </template>
               <el-menu-item :index="'/' + menuItem.path"  v-for="menuItem in item.children"
@@ -45,7 +45,18 @@ export default {
       leftMenuList:[],
       activeName:'',
       activeCollapse:false,
+<<<<<<< HEAD
       activePath:''
+=======
+      elIcon: {
+        '125': 'iconfont icon-user',
+        '103': 'iconfont icon-3702mima',
+        '101': 'iconfont icon-shangpin',
+        '102': 'iconfont icon-danju',
+        '145': 'iconfont icon-baobiao'
+      }
+
+>>>>>>> 013d0ba184e61a62926cc5ce489166a228a5cc99
     }
   },
   created() {
