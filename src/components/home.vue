@@ -14,13 +14,15 @@
       <el-aside :width="activeCollapse ? '64px' : '200px'" class="home_aside">
         <div class="toggle" @click="toggleCollapse">|||</div>
         <el-menu background-color="#313743" text-color="#fff" class="home_menu"
-                 active-text-color="#409EFF" :unique-opened="true" :collapse="activeCollapse" :collapse-transition="false">
+                 active-text-color="#409EFF" :unique-opened="true"
+                 :collapse="activeCollapse" :collapse-transition="false" router :default-active="activePath">
           <el-submenu :index="item.id + ''" v-for="item in leftMenuList" :key="item.id">
             <template slot="title">
               <i class="el-icon-location"></i>
               <span>{{item.authName}}</span>
             </template>
-              <el-menu-item :index="menuItem.id + ''"  v-for="menuItem in item.children" :key="menuItem.id">
+              <el-menu-item :index="'/' + menuItem.path"  v-for="menuItem in item.children"
+                            :key="menuItem.id" @click="changeHighLight('/' + menuItem.path)">
                 <i class="el-icon-menu"></i>
                 <span slot="title">{{menuItem.authName}}</span>
               </el-menu-item>
@@ -28,7 +30,9 @@
         </el-menu>
       </el-aside>
       <!--右侧内容主体-->
-      <el-main class="home_main">Main</el-main>
+      <el-main class="home_main">
+        <router-view></router-view>
+      </el-main>
     </el-container>
   </el-container>
 </template>
@@ -41,10 +45,12 @@ export default {
       leftMenuList:[],
       activeName:'',
       activeCollapse:false,
+      activePath:''
     }
   },
   created() {
-    this.getMenuList()
+    this.getMenuList(),
+    this.activePath = window.sessionStorage.getItem('activePath')
   },
   methods: {
     logOut() {
@@ -62,6 +68,10 @@ export default {
     },
     toggleCollapse() {
       this.activeCollapse = !this.activeCollapse;
+    },
+    changeHighLight(activePath) {
+      window.sessionStorage.setItem('activePath', activePath)
+      this.activePath = activePath
     }
   }
 }
