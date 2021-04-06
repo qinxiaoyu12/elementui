@@ -45,9 +45,7 @@ export default {
       leftMenuList:[],
       activeName:'',
       activeCollapse:false,
-<<<<<<< HEAD
-      activePath:''
-=======
+      activePath:'',
       elIcon: {
         '125': 'iconfont icon-user',
         '103': 'iconfont icon-3702mima',
@@ -55,8 +53,6 @@ export default {
         '102': 'iconfont icon-danju',
         '145': 'iconfont icon-baobiao'
       }
-
->>>>>>> 013d0ba184e61a62926cc5ce489166a228a5cc99
     }
   },
   created() {
