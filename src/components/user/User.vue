@@ -24,7 +24,32 @@
 
 <script>
 export default {
-  name: "User"
+  name: "User",
+  created() {
+    this.getUserData();
+  },
+  data() {
+    return {
+      userParams: {
+        query: '',
+        pagenum: 1,
+        pagesize: 2
+      },
+      userList:[],
+      total:null
+    }
+  },
+  methods: {
+    async getUserData() {
+        const {data: res} = await this.$axios.get('users', {params: this.userParams})
+        console.log(res);
+        if (res.meta.status !== 200) {
+          return this.$message.error('获取管理员列表失败');
+        }
+        this.userList = res.data.users;
+        this.total = res.data.total;
+    }
+  }
 }
 </script>
 
