@@ -18,6 +18,20 @@
             <el-button type="primary">添加用户</el-button>
           </el-col>
         </el-row>
+      <!--table表格数据渲染-->
+        <el-table :data="userList" stripe border>
+          <el-table-column type="index" label="#"></el-table-column>
+          <el-table-column prop="username" label="用户名"></el-table-column>
+          <el-table-column prop="email" label="邮箱"></el-table-column>
+          <el-table-column prop="mobile" label="电话"></el-table-column>
+          <el-table-column prop="role_name" label="角色"></el-table-column>
+          <el-table-column label="状态">
+            <template slot-scope="scope">
+              <el-switch v-model="scope.row.mg_state"></el-switch>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作"></el-table-column>
+        </el-table>
       </el-card>
     </div>
 </template>
