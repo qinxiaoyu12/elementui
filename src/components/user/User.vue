@@ -27,7 +27,7 @@
           <el-table-column prop="role_name" label="角色"></el-table-column>
           <el-table-column label="状态">
             <template slot-scope="scope">
-              <el-switch v-model="scope.row.mg_state"></el-switch>
+              <el-switch v-model="scope.row.mg_state" @change="getStateChange(scope.row)"></el-switch>
             </template>
           </el-table-column>
           <el-table-column label="操作">
@@ -38,6 +38,11 @@
             </el-tooltip>
           </el-table-column>
         </el-table>
+        <!--分页-->
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+            :current-page="userParams.pagenum" :page-sizes="[1, 2, 5, 10]"
+            :page-size="userParams.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+        </el-pagination>
       </el-card>
     </div>
 </template>
@@ -56,7 +61,7 @@ export default {
         pagesize: 2
       },
       userList:[],
-      total:null
+      total:0
     }
   },
   methods: {
@@ -69,6 +74,25 @@ export default {
         }
         this.userList = res.data.users;
         this.total = res.data.total;
+    },
+    handleSizeChange(newSize) {
+        this.userParams.pagesize = newSize
+        this.getUserData()
+    },
+    handleCurrentChange(newPage) {
+        this.userParams.pagenum = newPage
+        this.getUserData()
+    },
+    async getStateChange(newStateInfo) {
+      console.log(newStateInfo)
+      const {data: res}= await this.$axios.put(`users/${newStateInfo.id}/state/${newStateInfo.mg_state}`)
+      console.log(res);
+      if (res.meta.status !== 200) {
+        newStateInfo.mg_state = !newStateInfo.mg_state
+        return this.$message.error('更新状态失败');
+      } else {
+        this.$message.success('更新状态成功');
+      }
     }
   }
 }
