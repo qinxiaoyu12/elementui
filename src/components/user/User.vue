@@ -19,7 +19,7 @@
           </el-col>
         </el-row>
       <!--table表格数据渲染-->
-        <el-table :data="userList" stripe border>
+        <el-table :data="userList" stripe border style="width: 1200px;">
           <el-table-column type="index" label="#"></el-table-column>
           <el-table-column prop="username" label="用户名"></el-table-column>
           <el-table-column prop="email" label="邮箱"></el-table-column>
@@ -30,7 +30,13 @@
               <el-switch v-model="scope.row.mg_state"></el-switch>
             </template>
           </el-table-column>
-          <el-table-column label="操作"></el-table-column>
+          <el-table-column label="操作">
+            <el-button type="primary" size="mini" icon="el-icon-edit"></el-button>
+            <el-button type="danger" size="mini" icon="el-icon-delete"></el-button>
+            <el-tooltip class="item" effect="dark" content="设置用户权限" placement="top" :enterable="false">
+              <el-button type="warning" size="mini" icon="el-icon-setting"></el-button>
+            </el-tooltip>
+          </el-table-column>
         </el-table>
       </el-card>
     </div>
@@ -54,6 +60,7 @@ export default {
     }
   },
   methods: {
+    //获取管理员数据列表
     async getUserData() {
         const {data: res} = await this.$axios.get('users', {params: this.userParams})
         console.log(res);
