@@ -10,8 +10,8 @@
       <el-card>
         <el-row :gutter="20">
           <el-col :span="8">
-            <el-input placeholder="请输入内容" class="input-with-select">
-              <el-button slot="append" icon="el-icon-search"></el-button>
+            <el-input placeholder="请输入内容" class="input-with-select" clearable v-model="userParams.query" @clear="getUserData">
+              <el-button slot="append" icon="el-icon-search" @click="getUserData"></el-button>
             </el-input>
           </el-col>
           <el-col :span="7">
@@ -73,6 +73,7 @@ export default {
           return this.$message.error('获取管理员列表失败');
         }
         this.userList = res.data.users;
+        console.log(this.userList)
         this.total = res.data.total;
     },
     handleSizeChange(newSize) {
