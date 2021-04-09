@@ -15,7 +15,7 @@
             </el-input>
           </el-col>
           <el-col :span="7">
-            <el-button type="primary">添加用户</el-button>
+            <el-button type="primary" @click="dialogVisible=true">添加用户</el-button>
           </el-col>
         </el-row>
       <!--table表格数据渲染-->
@@ -43,6 +43,14 @@
             :current-page="userParams.pagenum" :page-sizes="[1, 2, 5, 10]"
             :page-size="userParams.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="total">
         </el-pagination>
+        <!--弹出添加用户对话框-->
+        <el-dialog title="提示" :visible.sync="dialogVisible" width="50%">
+          <span>这是一段信息</span>
+          <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisible=false">取 消</el-button>
+          <el-button type="primary" @click="dialogVisible=false">确 定</el-button>
+          </span>
+        </el-dialog>
       </el-card>
     </div>
 </template>
@@ -61,7 +69,8 @@ export default {
         pagesize: 2
       },
       userList:[],
-      total:0
+      total:0,
+      dialogVisible:false
     }
   },
   methods: {
@@ -94,7 +103,7 @@ export default {
       } else {
         this.$message.success('更新状态成功');
       }
-    }
+    },
   }
 }
 </script>
