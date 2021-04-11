@@ -44,11 +44,25 @@
             :page-size="userParams.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="total">
         </el-pagination>
         <!--弹出添加用户对话框-->
-        <el-dialog title="提示" :visible.sync="dialogVisible" width="50%">
-          <span>这是一段信息</span>
+        <el-dialog title="添加用户" :visible.sync="dialogVisible"
+                   width="50%" @close="dialogFromReset" >
+          <el-form :model="dialogFrom" :rules="dialogRules" ref="dialogFormRef" label-width="70px">
+            <el-form-item label="用户名" prop="username">
+              <el-input v-model="dialogFrom.username"></el-input>
+            </el-form-item>
+            <el-form-item label="密码" prop="password">
+              <el-input v-model="dialogFrom.password"></el-input>
+            </el-form-item>
+            <el-form-item label="邮箱" prop="email">
+              <el-input v-model="dialogFrom.email"></el-input>
+            </el-form-item>
+            <el-form-item label="手机号" prop="phone">
+              <el-input v-model="dialogFrom.phone"></el-input>
+            </el-form-item>
+          </el-form>
           <span slot="footer" class="dialog-footer">
           <el-button @click="dialogVisible=false">取 消</el-button>
-          <el-button type="primary" @click="dialogVisible=false">确 定</el-button>
+          <el-button type="primary" @click="addUser">确 定</el-button>
           </span>
         </el-dialog>
       </el-card>
@@ -62,6 +76,29 @@ export default {
     this.getUserData();
   },
   data() {
+    //验证邮箱规则
+    let validateEmail = (rule, value, callback) => {
+      const regEmail = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/
+
+      if (regEmail.test(value)) {
+        //合法的邮箱
+        return callback()
+      }
+
+      callback(new Error('请输入合法的邮箱'))
+    }
+
+    //验证手机号规则
+    let validatePhone = (rule, value, callback) => {
+      const regPhone = /^1[3456789]\d{9}$/
+
+      if (regPhone.test(value)) {
+        //合法的手机号
+        return callback()
+      }
+
+      callback(new Error('请输入合法的手机号'))
+     }
     return {
       userParams: {
         query: '',
@@ -70,7 +107,37 @@ export default {
       },
       userList:[],
       total:0,
-      dialogVisible:false
+      dialogVisible:false,
+      dialogFrom: {
+        username:'',
+        password:'',
+        email:'',
+        phone:''
+      },
+      dialogParam: {
+        username:'admin',
+        password:'123456',
+        email:'',
+        mobile:''
+      },
+      dialogRules: {
+        username: [
+          { required: true, message:'请输入名字', trigger: 'blur'},
+          { min: 3, max: 10, message: '长度在3到10个字符', trigger: 'blur'}
+        ],
+        password: [
+          { required: true, message:'请输入密码', trigger: 'blur'},
+          { min: 6, max: 15, message: '长度在6到15个字符', trigger: 'blur'}
+        ],
+        email: [
+          { required: true, message:'请输入邮箱', trigger: 'blur'},
+          { validator: validateEmail, trigger:'blur'}
+        ],
+        phone: [
+          { required: true, message:'请输入手机号', trigger: 'blur'},
+          { validator: validatePhone, trigger:'blur'}
+        ],
+      }
     }
   },
   methods: {
@@ -104,6 +171,19 @@ export default {
         this.$message.success('更新状态成功');
       }
     },
+    //点击取消重置表单
+    dialogFromReset() {
+      this.$refs.dialogFormRef.resetFields();
+    },
+    //添加用户
+    addUser() {
+      this.$refs.dialogFormRef.validate(async valid => {
+        console.log(valid);
+        //发起网路请求
+        const {data: res} = await this.$axios.post('users', this.dialogParam );
+        console.log(res)
+      })
+    }
   }
 }
 </script>
