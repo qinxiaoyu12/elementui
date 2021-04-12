@@ -243,15 +243,19 @@ export default {
     //修改之后发送用户的信息到数据库
     editUserInfo() {
       //发起表单预验证
-      this.$refs.editdialogFormRef.validate(valid => {
+      this.$refs.editdialogFormRef.validate(async valid => {
         if (!valid) return
         //预校验为真，发送数据到数据库
-        const {data: res} = this.$axios.put('users/' + this.id)
+        const {data: res} = await this.$axios.put('users/' + this.editData.id, {email: this.editData.email, mobile: this.editData.mobile})
         if (res.meta.status !== 200) {
           this.$message.error('修改用户数据失败');
         } else {
-          this.$message.success('修改用户数据成功');
+          //关闭对话框
+          this.editdialogVisible = false;
+          //更新用户数据
           this.getUserData();
+          //显示修改用户成功信息
+          this.$message.success('修改用户数据成功');
         }
       })
     }
