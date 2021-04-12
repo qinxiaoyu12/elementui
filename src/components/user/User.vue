@@ -1,4 +1,5 @@
 <template>
+
     <!--面包屑-->
     <div>
       <el-breadcrumb separator="/">
@@ -6,6 +7,7 @@
         <el-breadcrumb-item>用户管理</el-breadcrumb-item>
         <el-breadcrumb-item>用户列表</el-breadcrumb-item>
       </el-breadcrumb>
+
       <!--卡片-->
       <el-card>
         <el-row :gutter="20">
@@ -18,6 +20,7 @@
             <el-button type="primary" @click="dialogVisible=true">添加用户</el-button>
           </el-col>
         </el-row>
+
       <!--table表格数据渲染-->
         <el-table :data="userList" stripe border style="width: 1200px;">
           <el-table-column type="index" label="#"></el-table-column>
@@ -30,19 +33,23 @@
               <el-switch v-model="scope.row.mg_state" @change="getStateChange(scope.row)"></el-switch>
             </template>
           </el-table-column>
-          <el-table-column label="操作">
-            <el-button type="primary" size="mini" icon="el-icon-edit"></el-button>
+          <el-table-column label="操作" width="180px">
+            <template slot-scope="scope">
+            <el-button type="primary" size="mini" icon="el-icon-edit" @click="editUserFrom(scope.row.id)"></el-button>
             <el-button type="danger" size="mini" icon="el-icon-delete"></el-button>
             <el-tooltip class="item" effect="dark" content="设置用户权限" placement="top" :enterable="false">
               <el-button type="warning" size="mini" icon="el-icon-setting"></el-button>
             </el-tooltip>
+            </template>
           </el-table-column>
         </el-table>
+
         <!--分页-->
         <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
             :current-page="userParams.pagenum" :page-sizes="[1, 2, 5, 10]"
             :page-size="userParams.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="total">
         </el-pagination>
+
         <!--弹出添加用户对话框-->
         <el-dialog title="添加用户" :visible.sync="dialogVisible"
                    width="50%" @close="dialogFromReset" >
@@ -63,6 +70,15 @@
           <span slot="footer" class="dialog-footer">
           <el-button @click="dialogVisible=false">取 消</el-button>
           <el-button type="primary" @click="addUser">确 定</el-button>
+          </span>
+        </el-dialog>
+
+        <!--弹出修改用户数据对话框-->
+        <el-dialog title="修改用户" :visible.sync="editdialogVisible" width="50%">
+          <span>这是一段信息</span>
+          <span slot="footer" class="dialog-footer">
+          <el-button @click="editdialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="editdialogVisible = false">确 定</el-button>
           </span>
         </el-dialog>
       </el-card>
@@ -114,12 +130,6 @@ export default {
         email:'',
         phone:''
       },
-      dialogParam: {
-        username:'admin',
-        password:'123456',
-        email:'',
-        mobile:''
-      },
       dialogRules: {
         username: [
           { required: true, message:'请输入名字', trigger: 'blur'},
@@ -137,7 +147,9 @@ export default {
           { required: true, message:'请输入手机号', trigger: 'blur'},
           { validator: validatePhone, trigger:'blur'}
         ],
-      }
+      },
+      editdialogVisible: false,
+      editData:''
     }
   },
   methods: {
@@ -178,11 +190,28 @@ export default {
     //添加用户
     addUser() {
       this.$refs.dialogFormRef.validate(async valid => {
-        console.log(valid);
+        if (!valid) return
         //发起网路请求
-        const {data: res} = await this.$axios.post('users', this.dialogParam );
+        const {data: res} = await this.$axios.post('users', this.dialogFrom );
         console.log(res)
+        if (res.meta.status !== 201) {
+          this.$message.error('添加用户失败');
+        } else {
+          this.$message.success('添加用户成功');
+          this.getUserData();
+        }
       })
+    },
+    async editUserFrom(id) {
+          this.editdialogVisible = true;
+          const {data: res} =await this.$axios.get('users/' + id);
+          console.log(res);
+          if (res.meta.status !== 200) {
+            this.$message.error('请求用户id失败');
+          } else {
+            this.$message.success('请求用户id成功');
+            this.editData = res.data
+          }
     }
   }
 }
