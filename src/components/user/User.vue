@@ -74,11 +74,21 @@
         </el-dialog>
 
         <!--弹出修改用户数据对话框-->
-        <el-dialog title="修改用户" :visible.sync="editdialogVisible" width="50%">
-          <span>这是一段信息</span>
+        <el-dialog title="修改用户" :visible.sync="editdialogVisible" width="50%" @close="editDialogReset">
+          <el-form :model="editData" :rules="editdialogRules" ref="editdialogFormRef" label-width="70px">
+            <el-form-item label="用户名">
+              <el-input v-model="editData.username" disabled></el-input>
+            </el-form-item>
+            <el-form-item label="邮箱" prop="email">
+              <el-input v-model="editData.email"></el-input>
+            </el-form-item>
+            <el-form-item label="手机号" prop="mobile">
+              <el-input v-model="editData.mobile"></el-input>
+            </el-form-item>
+          </el-form>
           <span slot="footer" class="dialog-footer">
           <el-button @click="editdialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="editdialogVisible = false">确 定</el-button>
+          <el-button type="primary" @click="editUserInfo">确 定</el-button>
           </span>
         </el-dialog>
       </el-card>
@@ -149,7 +159,18 @@ export default {
         ],
       },
       editdialogVisible: false,
-      editData:''
+      editData:{},
+      //修改用户数据校验规则
+      editdialogRules: {
+        email: [
+          { required: true, message:'请输入邮箱', trigger: 'blur'},
+          { validator: validateEmail, trigger:'blur'}
+        ],
+        mobile: [
+          { required: true, message:'请输入手机号', trigger: 'blur'},
+          { validator: validatePhone, trigger:'blur'}
+        ],
+      }
     }
   },
   methods: {
@@ -187,8 +208,13 @@ export default {
     dialogFromReset() {
       this.$refs.dialogFormRef.resetFields();
     },
+    //点击取消按钮，修改表单被重置
+    editDialogReset() {
+      this.$refs.editdialogFormRef.resetFields();
+    },
     //添加用户
     addUser() {
+      //发起表单预验证
       this.$refs.dialogFormRef.validate(async valid => {
         if (!valid) return
         //发起网路请求
@@ -202,6 +228,7 @@ export default {
         }
       })
     },
+    //获取修改弹窗的id和数据
     async editUserFrom(id) {
           this.editdialogVisible = true;
           const {data: res} =await this.$axios.get('users/' + id);
@@ -212,6 +239,21 @@ export default {
             this.$message.success('请求用户id成功');
             this.editData = res.data
           }
+    },
+    //修改之后发送用户的信息到数据库
+    editUserInfo() {
+      //发起表单预验证
+      this.$refs.editdialogFormRef.validate(valid => {
+        if (!valid) return
+        //预校验为真，发送数据到数据库
+        const {data: res} = this.$axios.put('users/' + id)
+        if (res.meta.status !== 200) {
+          this.$message.error('修改用户数据失败');
+        } else {
+          this.$message.success('修改用户数据成功');
+          this.getUserData();
+        }
+      })
     }
   }
 }
