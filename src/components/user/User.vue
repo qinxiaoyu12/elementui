@@ -246,7 +246,7 @@ export default {
       this.$refs.editdialogFormRef.validate(valid => {
         if (!valid) return
         //预校验为真，发送数据到数据库
-        const {data: res} = this.$axios.put('users/' + id)
+        const {data: res} = this.$axios.put('users/' + this.id)
         if (res.meta.status !== 200) {
           this.$message.error('修改用户数据失败');
         } else {
