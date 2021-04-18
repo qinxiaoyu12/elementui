@@ -6,9 +6,12 @@ import global from './assets/css/global.css';
 import './assets/fonts/iconfont.css'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
-import axios from 'axios'
+import axios from 'axios';
+import {MessageBox} from 'element-ui';
+
 
 Vue.config.productionTip = false;
+Vue.prototype.$confirm = MessageBox.confirm;
 
 // import API from "./request/api";
 Vue.prototype.$axios = axios;
