@@ -279,6 +279,7 @@ export default {
           this.getUserData();
         }
       }
+      console.log(result);
     }
   }
 }
