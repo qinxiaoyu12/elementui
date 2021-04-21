@@ -71,7 +71,7 @@ export default {
       // console.log(res)
       if (res.meta.status !== 200) return this.$message.error(res.meta.msg);
       this.leftMenuList = res.data;
-      console.log(this.leftMenuList);
+      // console.log(this.leftMenuList);
     },
     toggleCollapse() {
       this.activeCollapse = !this.activeCollapse;
