@@ -36,7 +36,7 @@
           <el-table-column label="操作" width="180px">
             <template slot-scope="scope">
             <el-button type="primary" size="mini" icon="el-icon-edit" @click="editUserFrom(scope.row.id)"></el-button>
-            <el-button type="danger" size="mini" icon="el-icon-delete"></el-button>
+            <el-button type="danger" size="mini" icon="el-icon-delete" @click="removeUserById(scope.row.id)"></el-button>
             <el-tooltip class="item" effect="dark" content="设置用户权限" placement="top" :enterable="false">
               <el-button type="warning" size="mini" icon="el-icon-setting"></el-button>
             </el-tooltip>
@@ -63,8 +63,8 @@
             <el-form-item label="邮箱" prop="email">
               <el-input v-model="dialogFrom.email"></el-input>
             </el-form-item>
-            <el-form-item label="手机号" prop="phone">
-              <el-input v-model="dialogFrom.phone"></el-input>
+            <el-form-item label="手机号" prop="mobile">
+              <el-input v-model="dialogFrom.mobile"></el-input>
             </el-form-item>
           </el-form>
           <span slot="footer" class="dialog-footer">
@@ -138,7 +138,7 @@ export default {
         username:'',
         password:'',
         email:'',
-        phone:''
+        mobile:''
       },
       dialogRules: {
         username: [
@@ -153,7 +153,7 @@ export default {
           { required: true, message:'请输入邮箱', trigger: 'blur'},
           { validator: validateEmail, trigger:'blur'}
         ],
-        phone: [
+        mobile: [
           { required: true, message:'请输入手机号', trigger: 'blur'},
           { validator: validatePhone, trigger:'blur'}
         ],
@@ -225,6 +225,7 @@ export default {
         } else {
           this.$message.success('添加用户成功');
           this.getUserData();
+          this.dialogVisible = false;
         }
       })
     },
@@ -258,6 +259,26 @@ export default {
           this.$message.success('修改用户数据成功');
         }
       })
+    },
+    //删除用户
+    async removeUserById(id) {
+      const result = await this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
+      //如果result是confrim那就是继续，否则就是取消
+      if (result !== 'confirm') {
+        this.$message.info('取消删除用户')
+      } else {
+        const {data: res} = await this.$axios.delete('users/' + id)
+        if (res.meta.status !== 200) {
+          this.$message.error('删除用户失败')
+        } else {
+          this.$message.success('删除用户成功')
+          this.getUserData();
+        }
+      }
     }
   }
 }
