@@ -25,7 +25,7 @@
         <el-table-column label="操作" width="300px">
           <template slot-scope="scope">
             <el-button type="primary" size="mini" icon="el-icon-edit" @click="editRoles(scope.row.id)">编辑</el-button>
-            <el-button type="danger" size="mini" icon="el-icon-delete">删除</el-button>
+            <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteRoles(scope.row.id)">删除</el-button>
             <el-tooltip class="item" effect="dark" content="设置用户权限" placement="top" :enterable="false">
               <el-button type="warning" size="mini" icon="el-icon-setting">分配权限</el-button>
             </el-tooltip>
@@ -165,6 +165,26 @@ export default {
         this.editRolesDialogVisible = false;
         await this.getRolesList()
       })
+    },
+    //删除角色
+    async deleteRoles(id) {
+      const result = await this.$confirm('此操作将永久删除该角色, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
+      //如果result是confrim那就是继续，否则就是取消
+      if (result !== 'confirm') {
+        this.$message.error('取消删除该角色');
+      } else {
+        const {data: res} =await this.$axios.delete('roles/' + id);
+        console.log(res);
+        if (res.meta.status !== 200) {
+          this.$message.error('删除角色失败');
+        }
+        this.editRolesDialogVisible = false;
+        await this.getRolesList();
+      }
     }
   }
 }
