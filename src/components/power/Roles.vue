@@ -17,7 +17,20 @@
       </el-row>
       <el-table :data="rolesList" stripe border>
         <!--展开列-->
-        <el-table-column type="expand"></el-table-column>
+        <el-table-column type="expand">
+          <template slot-scope="scope">
+            <el-row v-for="(item, index) in scope.row.children">
+              <!--一级权限-->
+              <el-col :span="5" class="firstRights">
+                <el-tag>
+                  {{item.authName}}
+                </el-tag>
+              </el-col>
+              <!--二级权限和三级权限-->
+              <el-col :span="19"></el-col>
+            </el-row>
+          </template>
+        </el-table-column>
 
         <el-table-column type="index" label="#"></el-table-column>
         <el-table-column prop="roleName" label="角色名称"></el-table-column>
@@ -191,5 +204,7 @@ export default {
 </script>
 
 <style scoped>
-
+  .firstRights {
+    margin: 10px;
+  }
 </style>
