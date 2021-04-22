@@ -177,12 +177,12 @@ export default {
     //获取管理员数据列表
     async getUserData() {
         const {data: res} = await this.$axios.get('users', {params: this.userParams})
-        console.log(res);
+        // console.log(res);
         if (res.meta.status !== 200) {
           return this.$message.error('获取管理员列表失败');
         }
         this.userList = res.data.users;
-        console.log(this.userList)
+        // console.log(this.userList)
         this.total = res.data.total;
     },
     handleSizeChange(newSize) {
@@ -196,7 +196,7 @@ export default {
     async getStateChange(newStateInfo) {
       console.log(newStateInfo)
       const {data: res}= await this.$axios.put(`users/${newStateInfo.id}/state/${newStateInfo.mg_state}`)
-      console.log(res);
+      // console.log(res);
       if (res.meta.status !== 200) {
         newStateInfo.mg_state = !newStateInfo.mg_state
         return this.$message.error('更新状态失败');
@@ -219,7 +219,7 @@ export default {
         if (!valid) return
         //发起网路请求
         const {data: res} = await this.$axios.post('users', this.dialogFrom );
-        console.log(res)
+        // console.log(res)
         if (res.meta.status !== 201) {
           this.$message.error('添加用户失败');
         } else {
@@ -233,11 +233,11 @@ export default {
     async editUserFrom(id) {
           this.editdialogVisible = true;
           const {data: res} =await this.$axios.get('users/' + id);
-          console.log(res);
+          // console.log(res);
           if (res.meta.status !== 200) {
             this.$message.error('请求用户id失败');
           } else {
-            this.$message.success('请求用户id成功');
+            // this.$message.success('请求用户id成功');
             this.editData = res.data
           }
     },
@@ -279,7 +279,7 @@ export default {
           this.getUserData();
         }
       }
-      console.log(result);
+      // console.log(result);
     }
   }
 }
