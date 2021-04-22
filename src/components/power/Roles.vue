@@ -19,15 +19,32 @@
         <!--展开列-->
         <el-table-column type="expand">
           <template slot-scope="scope">
-            <el-row v-for="(item, index) in scope.row.children">
+            <el-row :class="['bdBottom', 'vcenter', i1 === 0 ? 'bdTop' : '']" v-for="(item1, i1) in scope.row.children" :key="item1.id">
               <!--一级权限-->
               <el-col :span="5" class="firstRights">
-                <el-tag>
-                  {{item.authName}}
+                <el-tag closable @close="deleteTagById(scope.row, item1.id)">
+                  {{item1.authName}}
                 </el-tag>
+                <i class="el-icon-caret-right"></i>
               </el-col>
               <!--二级权限和三级权限-->
-              <el-col :span="19"></el-col>
+              <el-col :span="19">
+                <el-row :class="[i2 === 0 ? '' : 'bdTop','vcenter']" v-for="(item2, i2) in item1.children" :key="item2.id">
+                  <el-col :span="6">
+                    <el-tag type="success" closable @close="deleteTagById(scope.row, item2.id)">
+                      {{item2.authName}}
+                    </el-tag>
+                    <i class="el-icon-caret-right"></i>
+                  </el-col>
+                  <el-col :span="18">
+                        <el-tag closable type="warning" v-for="(item3, i3) in item2.children" :key="item3.id"
+                                @close="deleteTagById(scope.row, item3.id)">
+                          {{item3.authName}}
+                        </el-tag>
+                        <i class="el-icon-caret-right"></i>
+                  </el-col>
+                </el-row>
+              </el-col>
             </el-row>
           </template>
         </el-table-column>
@@ -198,13 +215,42 @@ export default {
         this.editRolesDialogVisible = false;
         await this.getRolesList();
       }
+    },
+    //关闭权限tag标签
+    async deleteTagById(role, rightId) {
+      const result = await this.$confirm('此操作将永久删除该权限, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
+
+      if (result !== 'confirm') {
+        return this.$message.error('取消删除该权限')
+      }
+      const {data: res} = await this.$axios.delete(`roles/${role.id}/rights/${rightId}`)
+      console.log(res);
+      if (res.meta.status !== 200) {
+        this.$message.error('删除权限失败')
+      }
+      console.log(this.$message.success('删除权限成功'))
+      role.children = res.data;
     }
   }
 }
 </script>
 
 <style scoped>
-  .firstRights {
-    margin: 10px;
+  .el-tag {
+    margin: 7px;
+  }
+  .bdTop {
+    border-top: 1px solid #eee;
+  }
+  .bdBottom {
+   border-bottom: 1px solid #eee;
+  }
+  .vcenter {
+    display: flex;
+    align-items: center;
   }
 </style>
