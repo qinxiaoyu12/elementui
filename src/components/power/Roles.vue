@@ -57,7 +57,7 @@
             <el-button type="primary" size="mini" icon="el-icon-edit" @click="editRoles(scope.row.id)">编辑</el-button>
             <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteRoles(scope.row.id)">删除</el-button>
             <el-tooltip class="item" effect="dark" content="设置用户权限" placement="top" :enterable="false">
-              <el-button type="warning" size="mini" icon="el-icon-setting">分配权限</el-button>
+              <el-button type="warning" size="mini" icon="el-icon-setting" @click="settingRights">分配权限</el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -94,7 +94,16 @@
       <span slot="footer" class="dialog-footer">
           <el-button @click="editRolesDialogVisible = false">取 消</el-button>
           <el-button type="primary" @click="editRolesInfo">确 定</el-button>
-          </span>
+      </span>
+    </el-dialog>
+
+    <!--分配权限dialog-->
+    <el-dialog title="分配权限" :visible.sync="settingRightsDialogVisible" width="40%">
+      <el-tree :data="settingRightsData" :props="defaultProps" show-checkbox default-expand-all default-expanded-keys="[]"></el-tree>
+      <span slot="footer" class="dialog-footer">
+          <el-button @click="editRolesDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="editRolesInfo">确 定</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -134,6 +143,12 @@ export default {
           { required: true, message:'请输入角色描述', trigger: 'blur'},
           { min: 1, max: 25, message: '长度在1到25个字符', trigger: 'blur'}
         ]
+      },
+      settingRightsDialogVisible: false,
+      settingRightsData:[],
+      defaultProps: {
+        children: 'children',
+        label: 'authName'
       }
     }
   },
@@ -234,6 +249,17 @@ export default {
       }
       console.log(this.$message.success('删除权限成功'))
       role.children = res.data;
+    },
+    //分配权限
+    async settingRights() {
+      this.settingRightsDialogVisible = true;
+      const {data: res} = await this.$axios.get('rights/tree')
+      console.log(res);
+      if (res.meta.status !== 200) {
+        return this.$message.error('获取树形权限数据失败')
+      }
+      // console.log(this.$message.success('获取树形权限数据成功'));
+      this.settingRightsData = res.data;
     }
   }
 }
