@@ -98,10 +98,11 @@
     </el-dialog>
 
     <!--分配权限dialog-->
-    <el-dialog title="分配权限" :visible.sync="settingRightsDialogVisible" width="40%">
-      <el-tree :data="settingRightsData" :props="defaultProps" show-checkbox default-expand-all :default-checked-keys="defaultKeys"></el-tree>
+    <el-dialog title="分配权限" :visible.sync="settingRightsDialogVisible" width="40%" @close="setRightClosed">
+      <el-tree :data="settingRightsData" :props="defaultProps" show-checkbox default-expand-all
+               :default-checked-keys="defaultKeys"></el-tree>
       <span slot="footer" class="dialog-footer">
-          <el-button @click="editRolesDialogVisible = false">取 消</el-button>
+          <el-button @click="settingRightsDialogVisible = false">取 消</el-button>
           <el-button type="primary" @click="editRolesInfo">确 定</el-button>
       </span>
     </el-dialog>
@@ -150,7 +151,7 @@ export default {
         children: 'children',
         label: 'authName'
       },
-      defaultKeys:[]
+      defaultKeys:['142', '143']
     }
   },
   methods: {
@@ -223,7 +224,7 @@ export default {
       if (result !== 'confirm') {
         this.$message.error('取消删除该角色');
       } else {
-        const {data: res} =await this.$axios.delete('roles/' + id);
+        const {data: res} = await this.$axios.delete('roles/' + id);
         console.log(res);
         if (res.meta.status !== 200) {
           this.$message.error('删除角色失败');
@@ -252,8 +253,7 @@ export default {
       role.children = res.data;
     },
     //分配权限
-    async settingRights(roles) {
-      this.settingRightsDialogVisible = true;
+    async settingRights(role) {
       const {data: res} = await this.$axios.get('rights/tree')
       console.log(res);
       if (res.meta.status !== 200) {
@@ -264,16 +264,23 @@ export default {
       // this.editRolesDialogVisible = true;
 
       //调用获取id递归函数
-      this.getLeafKeys(roles, this.defaultKeys)
+      // this.getLeafKeys(role, this.defaultKeys);
+      this.settingRightsDialogVisible = true;
+      console.log(role);
+      // console.log(this.defaultKeys)
     },
     //得到三级权限的id的递归函数
-    getLeafKeys(node, array) {
-      if (!node.children) {
-         return array.push(node.id);
-      }
-      node.children.forEach(item => {
-        this.getLeafKeys(item, array)
-      })
+    // getLeafKeys(node, array) {
+    //   if (!node.children) {
+    //      return array.push(node.id);
+    //   }
+    //   node.children.forEach(item => {
+    //     this.getLeafKeys(item, array)
+    //   })
+    // },
+    //监听分配权限对话框的关闭
+    setRightClosed() {
+      this.defaultKeys = []
     }
   }
 }
