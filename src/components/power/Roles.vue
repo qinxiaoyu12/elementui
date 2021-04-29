@@ -100,10 +100,10 @@
     <!--分配权限dialog-->
     <el-dialog title="分配权限" :visible.sync="settingRightsDialogVisible" width="40%" @close="setRightClosed">
       <el-tree :data="settingRightsData" :props="defaultProps" show-checkbox default-expand-all
-               :default-checked-keys="defaultKeys"></el-tree>
+               :default-checked-keys="defaultKeys" node-key="id" ref="treeRef"></el-tree>
       <span slot="footer" class="dialog-footer">
           <el-button @click="settingRightsDialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="editRolesInfo">确 定</el-button>
+          <el-button type="primary" @click="EditRightsList">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -151,7 +151,8 @@ export default {
         children: 'children',
         label: 'authName'
       },
-      defaultKeys:['142', '143']
+      defaultKeys:[],
+      rolesId:''
     }
   },
   methods: {
@@ -255,7 +256,7 @@ export default {
     //分配权限
     async settingRights(role) {
       const {data: res} = await this.$axios.get('rights/tree')
-      console.log(res);
+      // console.log(res);
       if (res.meta.status !== 200) {
         return this.$message.error('获取树形权限数据失败')
       }
@@ -264,23 +265,41 @@ export default {
       // this.editRolesDialogVisible = true;
 
       //调用获取id递归函数
-      // this.getLeafKeys(role, this.defaultKeys);
+      this.getLeafKeys(role, this.defaultKeys);
       this.settingRightsDialogVisible = true;
-      console.log(role);
+      this.rolesId = role.id
+      // console.log(role);
       // console.log(this.defaultKeys)
     },
     //得到三级权限的id的递归函数
-    // getLeafKeys(node, array) {
-    //   if (!node.children) {
-    //      return array.push(node.id);
-    //   }
-    //   node.children.forEach(item => {
-    //     this.getLeafKeys(item, array)
-    //   })
-    // },
+    getLeafKeys(node, array) {
+      if (!node.children) {
+         return array.push(node.id);
+      }
+      node.children.forEach(item => {
+        this.getLeafKeys(item, array)
+      })
+    },
     //监听分配权限对话框的关闭
     setRightClosed() {
       this.defaultKeys = []
+    },
+    //修改tree树形权限，并提交权限到数据库
+    async EditRightsList() {
+      const chooseId = [
+        ...this.$refs.treeRef.getCheckedKeys(),
+        ...this.$refs.treeRef.getHalfCheckedKeys()
+      ]
+      const newChooseId = chooseId.join(',')
+      console.log(newChooseId);
+
+      const {data: res} = await this.$axios.post(`roles/${this.rolesId}/rights` , {rids: newChooseId})
+      if (res.meta.status !== 200) {
+        return this.$message.error('角色授权失败')
+      }
+      console.log(this.$message.success('角色授权成功'));
+      await this.getRolesList();
+      this.settingRightsDialogVisible = false;
     }
   }
 }
