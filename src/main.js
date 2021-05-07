@@ -8,9 +8,11 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import axios from 'axios';
 import {MessageBox} from 'element-ui';
+import TreeTable from 'vue-table-with-tree-grid'
 
 
 Vue.config.productionTip = false;
+Vue.component('tree-table', TreeTable)
 Vue.prototype.$confirm = MessageBox.confirm;
 
 // import API from "./request/api";
@@ -24,6 +26,8 @@ axios.interceptors.request.use(config => {
   return config;
 })
 Vue.use(ElementUI);
+
+
 
 new Vue({
   el: '#app',
