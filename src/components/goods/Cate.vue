@@ -14,39 +14,39 @@
             <el-button type="primary">添加分类</el-button>
           </el-col>
         </el-row>
-      </el-card>
 
-      <!--table表格-->
-      <tree-table :data="cateList" :columns="columns"
-                  :selection-type="false" :expand-type="false"
-                  show-index index-text="#" border :show-row-hover="false">
+        <!--table表格-->
+        <tree-table :data="cateList" :columns="columns" class="treeTable"
+                    :selection-type="false" :expand-type="false"
+                    show-index index-text="#" border :show-row-hover="false">
           <!--是否有效-->
-        <template slot="likes" slot-scope="scope">
-          <i class="el-icon-success" v-if="scope.row.cat_deleted === false" style="color: lightgreen;"></i>
-          <i class="el-icon-error" v-else style="color: red;"></i>
-        </template>
+          <template slot="likes" slot-scope="scope">
+            <i class="el-icon-success" v-if="scope.row.cat_deleted === false" style="color: lightgreen;"></i>
+            <i class="el-icon-error" v-else style="color: red;"></i>
+          </template>
           <!--商品排序-->
           <template slot-scope="scope" slot="order">
-              <el-tag size="mini" v-if="scope.row.cat_level === 0">一级</el-tag>
-              <el-tag size="mini" type="success" v-else-if="scope.row.cat_level === 1">二级</el-tag>
-              <el-tag size="mini" type="warning" v-else>三级</el-tag>
+            <el-tag size="mini" v-if="scope.row.cat_level === 0">一级</el-tag>
+            <el-tag size="mini" type="success" v-else-if="scope.row.cat_level === 1">二级</el-tag>
+            <el-tag size="mini" type="warning" v-else>三级</el-tag>
           </template>
           <!--商品操作-->
           <template slot-scope="scope" slot="opt">
-              <el-button type="primary" size="mini">修改</el-button>
-              <el-button type="danger" size="mini">删除</el-button>
+            <el-button type="primary" size="mini">修改</el-button>
+            <el-button type="danger" size="mini">删除</el-button>
           </template>
-      </tree-table>
-      <!--分页-->
+        </tree-table>
+        <!--分页-->
         <el-pagination
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-                :current-page="cateInfo.pagenum"
-                :page-sizes="[1, 5, 10, 15]"
-                :page-size="5"
-                layout="total, sizes, prev, pager, next, jumper"
-                :total="total">
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="cateInfo.pagenum"
+            :page-sizes="[1, 5, 10, 15]"
+            :page-size="5"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total">
         </el-pagination>
+      </el-card>
     </div>
 </template>
 
@@ -80,14 +80,12 @@
                 //排序列模板
                 {
                     label: '排序',
-                    prop: 'cat_level',
                     type: 'template',
                     template: 'order'
                 },
                 //操作模板
                 {
                     label: '操作',
-                    prop: '',
                     type: 'template',
                     template: 'opt'
                 }
@@ -120,5 +118,7 @@
 </script>
 
 <style scoped>
-
+  .treeTable {
+    margin-top: 15px;
+  }
 </style>
