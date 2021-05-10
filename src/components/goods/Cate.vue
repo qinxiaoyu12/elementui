@@ -11,7 +11,7 @@
       <el-card>
         <el-row>
           <el-col>
-            <el-button type="primary">添加分类</el-button>
+            <el-button type="primary" @click="addCateDialog">添加分类</el-button>
           </el-col>
         </el-row>
 
@@ -46,6 +46,25 @@
             layout="total, sizes, prev, pager, next, jumper"
             :total="total">
         </el-pagination>
+          <!--添加分类dialog-->
+          <el-dialog title="添加分类" :visible.sync="addCateDialogVisible" width="50%">
+            <el-form :model="addCateFrom" :rules="addCateRules" label-width="100px" ref="addCateDialogRef">
+                <el-form-item label="分类名称:" prop="cat_name">
+                    <el-input v-model="addCateFrom.cat_name"></el-input>
+                </el-form-item>
+                <el-form-item label="父级分类:">
+                    <el-cascader
+                            v-model="addCateValue"
+                            :options="options"
+                            :props="{ expandTrigger: 'hover' }"
+                            @change="handleChange"></el-cascader>
+                    </el-form-item>
+            </el-form>
+          <span slot="footer" class="dialog-footer">
+          <el-button @click="addCateDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="addCategories">确 定</el-button>
+          </span>
+          </el-dialog>
       </el-card>
     </div>
 </template>
@@ -89,7 +108,25 @@
                     type: 'template',
                     template: 'opt'
                 }
-            ]
+            ],
+              addCateDialogVisible: false,
+              addCateRules:{
+                  cat_name: [
+                      { required: true, message:'请输入分类名称', trigger: 'blur'},
+                      { min: 1, max: 10, message: '长度在1到10个字符', trigger: 'blur'}
+                  ],
+              },
+              addCateFrom:{
+                  cat_name:'',
+                  //父级分类的id
+                  cat_pid:0,
+                  //分类的等级默认添加为一级分类
+                  cat_level:0
+              },
+              addCateValue:[],
+              options: [
+                  {}
+              ]
           }
         },
       methods:{
@@ -112,6 +149,18 @@
           handleCurrentChange(newPageNum) {
             this.cateInfo.pagenum = newPageNum;
             this.getGoodsList();
+          },
+          //添加分类
+          addCateDialog() {
+              this.addCateDialogVisible = true;
+          },
+          //确定添加分类
+          addCategories() {
+
+          },
+          //父级分类级联选择器
+          handleChange() {
+
           }
       }
     }
