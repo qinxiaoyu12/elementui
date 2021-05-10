@@ -54,10 +54,10 @@
                 </el-form-item>
                 <el-form-item label="父级分类:">
                     <el-cascader
-                            v-model="addCateValue"
-                            :options="options"
+                            v-model="addCateValue" clearable class="parentCate"
+                            :options="parentCateList"
                             :props="{ expandTrigger: 'hover' }"
-                            @change="handleChange"></el-cascader>
+                            @change="parentCateChange"></el-cascader>
                     </el-form-item>
             </el-form>
           <span slot="footer" class="dialog-footer">
@@ -124,9 +124,16 @@
                   cat_level:0
               },
               addCateValue:[],
-              options: [
-                  {}
-              ]
+              parentCateDegree:{
+                type: 2
+              },
+              //父级分类列表
+              parentCateList:[],
+              props: {
+                value:'cat_id',
+                label:'cat_name',
+                children:'children'
+              }
           }
         },
       methods:{
@@ -152,6 +159,7 @@
           },
           //添加分类
           addCateDialog() {
+              this.getParentCateList();
               this.addCateDialogVisible = true;
           },
           //确定添加分类
@@ -159,8 +167,17 @@
 
           },
           //父级分类级联选择器
-          handleChange() {
+          parentCateChange() {
 
+          },
+          //获取父级分类数据
+          async getParentCateList() {
+                const {data: res} = await this.$axios.get('categories', {params: this.parentCateDegree})
+                console.log(res);
+                if (res.meta.status !== 200) {
+                    return this.$message.error('获取父级分类数据列表失败')
+                }
+                this.parentCateList = res.data;
           }
       }
     }
@@ -169,5 +186,8 @@
 <style scoped>
   .treeTable {
     margin-top: 15px;
+  }
+  .parentCate {
+      width: 100%;
   }
 </style>
