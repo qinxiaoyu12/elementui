@@ -264,17 +264,25 @@
             })
           },
           //删除商品分类
-           deleteGoodsCate(id) {
-                const result = this.$confirm('此操作将永久删除该文件，是否继续？', '提示', {
+           async deleteGoodsCate(id) {
+                const result = await this.$confirm('此操作将永久删除该文件，是否继续？', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type:'warning'
-                }).then(() => {
-                    console.log(result)
-                }).catch(() => {
-                    console.log(result)
-                })
-
+                }).catch(err => err)
+               //如果result是confirm那就是继续，否则就是取消
+               if (result !== 'confirm') {
+                   return this.$message.info('取消删除商品分类')
+               } else {
+                   const {data: res} = await this.$axios.delete('categories/' + id)
+                   console.log(res);
+                   if (res.meta.status !==200) {
+                       return this.$message.error('删除商品父级分类失败')
+                   } else {
+                       this.$message.success('删除商品分类成功');
+                       await this.getGoodsList();
+                   }
+               }
           }
       }
     }
