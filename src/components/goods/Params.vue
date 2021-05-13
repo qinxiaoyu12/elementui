@@ -117,7 +117,7 @@
                 if (res.meta.status !== 200) {
                     return this.$message.error('获取要被级联选择器渲染的数据失败')
                 }
-                this.$message.success('获取要被级联选择器渲染的数据成功')
+                // this.$message.success('获取要被级联选择器渲染的数据成功')
                 console.log(res);
                 this.parentCateList = res.data;
             },
@@ -129,7 +129,7 @@
                 if (res.meta.status !== 200) {
                     return this.$message.error('获取参数列表失败')
                 }
-                console.log(this.$message.success('获取参数列表成功'))
+                // console.log(this.$message.success('获取参数列表成功'))
                 if (this.activeName = "many") {
                     //获取到动态参数的数据列表
                     this.dynamicParams = res.data;
