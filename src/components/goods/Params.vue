@@ -143,8 +143,18 @@
             },
             //dynamicParams删除功能
             async deleteDynamicParams() {
-                const {data: res} = await this.$axios.delete(`categories/${this.getCateId}/attributes/${this.dynamicParams.attr_id}`)
-                console.log(res);
+                const result = await this.$confirm('此操作将永久删除该文件，是否继续？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type:'warning'
+                }).catch(err => err)
+                if (result !== 'confirm') {
+                    return this.$message.info('取消删除dynamicParams表格中的数据')
+                }
+                else {
+                    const {data: res} = await this.$axios.delete(`categories/${this.getCateId}/attributes/${this.dynamicParams.attr_id}`)
+                    console.log(res);
+                }
             },
             //staticAttribute编辑功能
             editStaticAttribute() {
@@ -152,7 +162,16 @@
             },
             //staticAttribute删除功能
             async deleteStaticAttribute() {
-                const {data: res} = await this.$axios.delete(`categories/${this.getCateId}/attributes/${this.staticAttribute.attr_id}`)
+                const result = await this.$confirm('此操作将永久删除该文件，是否继续？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type:'warning'
+                }).catch(err => err)
+                if (result !== 'confirm') {
+                    return this.$message.info('取消删除dynamicParams表格中的数据')
+                } else {
+                    const {data: res} = await this.$axios.delete(`categories/${this.getCateId}/attributes/${this.staticAttribute.attr_id}`)
+                }
             }
         }
     }
