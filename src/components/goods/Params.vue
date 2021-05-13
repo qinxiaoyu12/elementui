@@ -28,10 +28,35 @@
                 <el-tab-pane label="动态参数" name="many">
                     <el-button type="primary" size="mini" :disabled="isDisabled">添加参数</el-button>
                 </el-tab-pane>
-                <el-tab-pane label="静态属性" name="second">
-                    <el-button type="primary" size="only" :disabled="isDisabled">添加属性</el-button>
+                <el-tab-pane label="静态属性" name="only">
+                    <el-button type="primary" size="mini" :disabled="isDisabled">添加属性</el-button>
                 </el-tab-pane>
             </el-tabs>
+
+            <!--动态参数显示表格-->
+
+            <el-table :data="dynamicParams" stripe border style="width: 1200px;" v-if="activeName='many'">
+                <el-table-column type="index" label="#"></el-table-column>
+                <el-table-column prop="attr_name" label="参数名称"></el-table-column>
+                <el-table-column label="操作">
+                    <template slot-scope="scope">
+                        <el-button type="primary" size="mini" icon="el-icon-edit" @click="editDynamicParams(scope.row.attr_id)">编辑</el-button>
+                        <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteDynamicParams(scope.row.attr_id)">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+
+            <!--静态属性显示表格-->
+            <el-table :data="staticAttribute" stripe border style="width: 1200px;" v-else>
+                <el-table-column type="index" label="#"></el-table-column>
+                <el-table-column prop="attr_name" label="属性名称"></el-table-column>
+                <el-table-column label="操作">
+                    <template slot-scope="scope">
+                        <el-button type="primary" size="mini" icon="el-icon-edit" @click="editStaticAttribute(scope.row.attr_id)">编辑</el-button>
+                        <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteStaticAttribute(scope.row.attr_id)">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
         </el-card>
     </div>
 </template>
@@ -54,6 +79,8 @@
                 parentCateList:[],
                 activeName:'many',
                 disabled:false,
+                dynamicParams:[],
+                staticAttribute:[]
             }
         },
         computed:{
@@ -96,8 +123,36 @@
             },
             //tab标签页切换触发函数
             async handleClick() {
-                const {data: res} = await this.$axios.get(`categories/${this.getCateId}/attributes`, {params: this.activeName})
+                const {data: res} = await this.$axios.get(`categories/${this.getCateId}/attributes`, {params: {sel: this.activeName}})
                 console.log(res);
+                console.log(this.activeName);
+                if (res.meta.status !== 200) {
+                    return this.$message.error('获取参数列表失败')
+                }
+                console.log(this.$message.success('获取参数列表成功'))
+                if (this.activeName = "many") {
+                    //获取到动态参数的数据列表
+                    this.dynamicParams = res.data;
+                }
+                    //获取到静态属性的数据列表
+                    this.staticAttribute = res.data;
+            },
+            //dynamicParams编辑功能
+            editDynamicParams() {
+
+            },
+            //dynamicParams删除功能
+            async deleteDynamicParams() {
+                const {data: res} = await this.$axios.delete(`categories/${this.getCateId}/attributes/${this.dynamicParams.attr_id}`)
+                console.log(res);
+            },
+            //staticAttribute编辑功能
+            editStaticAttribute() {
+
+            },
+            //staticAttribute删除功能
+            async deleteStaticAttribute() {
+                const {data: res} = await this.$axios.delete(`categories/${this.getCateId}/attributes/${this.staticAttribute.attr_id}`)
             }
         }
     }
