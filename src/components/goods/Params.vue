@@ -26,7 +26,7 @@
             <!--动态属性和静态属性-->
             <el-tabs v-model="activeName" @tab-click="handleClick">
                 <el-tab-pane label="动态参数" name="many">
-                    <el-button type="primary" size="mini" :disabled="isDisabled">添加参数</el-button>
+                    <el-button type="primary" size="mini" :disabled="isDisabled" @click="">添加参数</el-button>
                 </el-tab-pane>
                 <el-tab-pane label="静态属性" name="only">
                     <el-button type="primary" size="mini" :disabled="isDisabled">添加属性</el-button>
@@ -58,6 +58,19 @@
                 </el-table-column>
             </el-table>
         </el-card>
+
+            <!--添加参数和添加属性的共用dialog-->
+        <el-dialog :title="chooseDialog" :visible.sync="addParamsDialogVisible" width="50%" @close="addParamsDialogReset">
+            <el-form :model="addParamsFrom" :rules="addParamsRules" label-width="100px" ref="addParamsDialogRef">
+                <el-form-item label="分类名称:" prop="cat_name">
+                    <el-input v-model="addParamsFrom.attr_name"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+          <el-button @click="addParamsDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="addParams">确 定</el-button>
+          </span>
+        </el-dialog>
     </div>
 </template>
 
@@ -80,7 +93,10 @@
                 activeName:'many',
                 disabled:false,
                 dynamicParams:[],
-                staticAttribute:[]
+                staticAttribute:[],
+                addParamsDialogVisible:false,
+                addParamsFrom:[],
+                addParamsRules:{}
             }
         },
         computed:{
@@ -97,6 +113,14 @@
                   return this.chooseSelectKeys[2]
               }
               return null;
+          },
+          chooseDialog() {
+              if (this.activeName == "many") {
+                  return '动态参数'
+              }
+              else {
+                  return '静态属性'
+              }
           }
         },
         methods: {
@@ -172,6 +196,10 @@
                 } else {
                     const {data: res} = await this.$axios.delete(`categories/${this.getCateId}/attributes/${this.staticAttribute.attr_id}`)
                 }
+            },
+            //重置添加参数和添加属性的共用dialog
+            addParamsDialogReset() {
+
             }
         }
     }
