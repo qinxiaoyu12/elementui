@@ -65,6 +65,13 @@
                     return true;
                 }
                 return false;
+            },
+            //获取当前选中的三级分类的id
+            cateId() {
+                if (this.selectCateKeys.length === 3) {
+                    return this.selectCateKeys[2];
+                }
+                return null;
             }
         },
         methods: {
@@ -79,7 +86,8 @@
             },
             //级联选择框选择项变化，会触发这个函数
             handleChange() {
-               //证明选中的不是三级分类
+                // if (this.$refs.refHandle) return this.$refs.refHandle.dropDownVisible = false;
+                //证明选中的不是三级分类
                 if (this.selectCateKeys.length !== 3) {
                     this.selectCateKeys = [];
                     return

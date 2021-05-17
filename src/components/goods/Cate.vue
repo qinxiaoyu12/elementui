@@ -54,7 +54,7 @@
                 </el-form-item>
                 <el-form-item label="父级分类:">
                     <el-cascader
-                            v-model="selectKeys" clearable  class="parentCate" change-on-select
+                            v-model="selectKeys" clearable  class="parentCate" change-on-select ref="handleRef"
                             :options="parentCateList" expand-trigger="hover"
                             :props="props"
                             @change="parentCateChange"></el-cascader>
@@ -88,6 +88,14 @@
         name: "",
         created() {
           this.getGoodsList()
+        },
+        //选择级联选择框后下拉框自动收起
+        watch: {
+            selectKeys() {
+                if (this.$refs.handleRef) {
+                    this.$refs.handleRef.dropDownVisible = false; //监听值发生变化就关闭它
+                }
+            }
         },
       data() {
           return {
@@ -203,6 +211,7 @@
           },
           //父级分类级联选择器
           parentCateChange() {
+              if (this.$refs.refHandle) return this.$refs.refHandle.dropDownVisible = false;
               console.log(this.selectKeys)
               //判断添加分类是否有父级分类
               if (this.selectKeys.length > 0) {
