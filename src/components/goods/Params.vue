@@ -17,7 +17,7 @@
         <el-col>
           <span>选择商品分类：</span>
           <!--选择商品分类的级联选择框-->
-          <el-cascader
+          <el-cascader ref="handleRef"
               v-model="selectCateKeys"
               :options="cateList"
               :props="props"
@@ -36,8 +36,8 @@
             <el-table-column label="参数名称" prop="attr_name"></el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
-                <el-button type="primary" size="mini" icon="el-icon-edit">编辑</el-button>
-                <el-button type="danger" size="mini" icon="el-icon-delete">删除</el-button>
+                <el-button type="primary" size="mini" icon="el-icon-edit" @click="editParams(scope.row.attr_id)">编辑</el-button>
+                <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteParams">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -51,8 +51,8 @@
             <el-table-column label="属性名称" prop="attr_name"></el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
-                <el-button type="primary" size="mini" icon="el-icon-edit">编辑</el-button>
-                <el-button type="danger" size="mini" icon="el-icon-delete">删除</el-button>
+                <el-button type="primary" size="mini" icon="el-icon-edit" @click="editParams(scope.row.attr_id)">编辑</el-button>
+                <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteParams">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -61,18 +61,33 @@
     </el-card>
 
     <!--添加参数对话框-->
-    <el-dialog :title="'添加' + titleText" :visible.sync="addDialogVisible" width="50%" @close="addFormReSet">
+    <el-dialog :title="'添加' + titleText" :visible.sync="addDialogVisible" width="50%" @close="paramsDialogReset">
       <!--添加参数的对话框表单-->
       <el-form :model="addForm" :rules="addRules" ref="addRuleFormRef" label-width="100px">
         <el-form-item :label="titleText" prop="attr_name">
-          <el-input v-model="addForm.name"></el-input>
+          <el-input v-model="addForm.attr_name"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
     <el-button @click="addDialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="addDialogVisible = false">确 定</el-button>
+    <el-button type="primary" @click="addParams">确 定</el-button>
   </span>
     </el-dialog>
+
+    <!--添加参数对话框-->
+    <el-dialog :title="'修改' + titleText" :visible.sync="editDialogVisible" width="50%" @close="editParamsDialogReset">
+      <!--添加参数的对话框表单-->
+      <el-form :model="editForm" :rules="editRules" ref="editRuleFormRef" label-width="100px">
+        <el-form-item :label="titleText" prop="attr_name">
+          <el-input v-model="editForm.attr_name"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+    <el-button @click="editDialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="SubmitParams">确 定</el-button>
+  </span>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -82,6 +97,14 @@ export default {
   created() {
     this.getCateList();
   },
+    //选择级联选择框后下拉框自动收起
+    watch: {
+        selectCateKeys() {
+            if (this.$refs.handleRef) {
+                this.$refs.handleRef.dropDownVisible = false; //监听值发生变化就关闭它
+            }
+        }
+    },
   data() {
     return {
       //商品分类列表
@@ -105,7 +128,13 @@ export default {
         attr_name: [
           { required: true, message:'请输入参数名称', trigger: 'blur'}
         ]
-
+      },
+      editDialogVisible: false,
+      editForm:{},
+      editRules:{
+        attr_name: [
+          { required: true, message:'请输入参数名称', trigger: 'blur'}
+        ]
       }
     }
   },
@@ -173,8 +202,71 @@ export default {
         this.onlyTableData = res.data;
       }
     },
-    addFormReSet() {
-      this.$refs.addRuleFormRef.resetFields();
+    //添加参数dialog表单关闭后重置数据
+      paramsDialogReset() {
+        this.$refs.addRuleFormRef.resetFields();
+    },
+    //编辑参数对话框关闭后表单重置
+    editParamsDialogReset() {
+      this.$refs.editRuleFormRef.resetFields();
+    },
+    //添加动态参数或者静态属性
+    addParams() {
+        //发起表单预校验
+        this.$refs.addRuleFormRef.validate( async valid => {
+            if (!valid) return
+            const {data: res} = await this.$axios.post(`categories/${this.cateId}/attributes`, {attr_name:this.addForm.attr_name, attr_sel:this.activeName})
+            if (res.meta.status !== 201) {
+              return this.$message.error('添加动态参数或者静态属性失败')
+            }
+            // console.log(this.$message.success('添加动态参数或者静态属性成功'))
+            this.addDialogVisible = false;
+            await this.getParamsList();
+        })
+    },
+    //编辑参数列表,根据ID查询参数
+    async editParams(attrId) {
+      this.editDialogVisible = true;
+      const {data: res} = await this.$axios.get(`categories/${this.cateId}/attributes/` + attrId, {params: {attr_sel:this.activeName}})
+      if (res.meta.status !== 200) {
+        return this.$message.error('根据ID查询参数失败')
+      }
+      console.log(res.data)
+      // console.log(this.$message.success('根据ID查询参数成功'));
+      this.editForm = res.data;
+    },
+    //获取到参数后修改并提交到数据库
+    SubmitParams() {
+      this.$refs.editRuleFormRef.validate(async valid => {
+        if (!valid) return
+        const {data: res} = await this.$axios.put(`categories/${this.cateId}/attributes/` + this.editForm.attr_id, {attr_name:this.editForm.attr_name, attr_sel:this.activeName})
+        console.log(res);
+        if (res.meta.status !== 200) {
+          return this.$message.error('获取到参数后并提交到数据库失败')
+        }
+        this.editDialogVisible = false;
+        await this.getParamsList();
+      })
+    },
+    //删除选择的参数数据
+    async deleteParams() {
+      const result = await this.$confirm('此操作将永久删除该参数，是否继续？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type:'warning'
+      }).catch(err => err)
+      //如果result是confirm，那就是永久删除该参数
+      if (result !== 'confirm') {
+        return this.$message.info('取消删除参数')
+      }
+      else {
+        const {data: res} = await this.$axios.delete(`categories/${this.cateId}/attributes/` + this.editForm.attr_id)
+        if (res.meta.status !== 200) {
+          return this.$message.error('删除操作失败')
+        }
+        this.$message.success('删除商品分类成功');
+        await this.getParamsList();
+      }
     }
   }
 }
