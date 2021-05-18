@@ -34,15 +34,15 @@
             <el-table-column type="expand">
               <template slot-scope="scope">
                 <!--渲染tag标签-->
-                <el-tag :key="i" v-for="(item,i) in scope.row.attr_vals" closable>
+                <el-tag :key="i" v-for="(item,i) in scope.row.attr_vals" closable @close="deleteTag(i, scope.row)">
                   {{item}}
                 </el-tag>
                 <!--动态编辑标签-->
-                <el-input class="input-new-tag" v-if="inputVisible" v-model="inputValue"
-                        ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm"
-                        @blur="handleInputConfirm">
+                <el-input class="input-new-tag" v-if="scope.row.inputVisible" v-model="scope.row.inputValue"
+                        ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm(scope.row)"
+                        @blur="handleInputConfirm(scope.row)">
                 </el-input>
-                <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
+                <el-button v-else class="button-new-tag" size="small" @click="showInput(scope.row)">+ New Tag</el-button>
               </template>
             </el-table-column>
             <el-table-column type="index" label="#"></el-table-column>
@@ -149,10 +149,6 @@ export default {
           { required: true, message:'请输入参数名称', trigger: 'blur'}
         ]
       },
-      //动态编辑标签的input和button的选择值
-      inputVisible:false,
-      //input绑定的值
-      inputValue:''
     }
   },
   computed:{
@@ -215,6 +211,8 @@ export default {
       console.log(res.data)
       res.data.forEach(function (item) {
         item.attr_vals = item.attr_vals ? item.attr_vals.split(' ') : []
+        item.inputVisible = false;
+        item.inputValue = '';
       })
       console.log(res.data)
       if (this.activeName === 'many') {
@@ -290,12 +288,40 @@ export default {
       }
     },
     //无论是按下enter还是blur离开input都会触发此函数
-    handleInputConfirm() {
-
+    async handleInputConfirm(row) {
+      if (row.inputValue.trim().length === 0) {
+        row.inputVisible = false;
+        row.inputValue = ''
+        return
+      }
+      //如果没有return,则证明输入的内容需要做后续的处理
+      row.attr_vals.push(row.inputValue.trim());
+      row.inputVisible = false;
+      row.inputValue = ''
+      //保存添加的tag标签
+     await this.saveTagData(row);
+    },
+    //保存tag标签
+    async saveTagData(row) {
+      //保存添加的tag标签
+      const {data: res} = await this.$axios.put(`categories/${this.cateId}/attributes/${row.attr_id}`, {attr_name:row.attr_name, attr_sel:row.attr_sel, attr_vals:row.attr_vals.join(' ')})
+      if (res.meta.status !== 200) {
+        return this.$message.error('保存添加的tag标签失败')
+      }
+      this.$message.success('保存添加的tag标签成功')
     },
     //el-tag后的button触发按钮
-    showInput() {
-      this.inputVisible = true;
+    showInput(row) {
+      row.inputVisible = true;
+      //等页面渲染完之后获取input焦点
+      this.$nextTick(_ => {
+        this.$refs.saveTagInput.$refs.input.focus();
+      });
+    },
+    //删除tag标签
+    deleteTag(i, row) {
+      row.attr_vals.splice(i, 1)
+      this.saveTagData(row);
     }
   }
 }
