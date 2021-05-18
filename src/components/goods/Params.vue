@@ -31,13 +31,26 @@
           <el-button type="primary" size="mini" :disabled="isBtnDisabled" @click="addDialogVisible=true">添加参数</el-button>
           <!--动态参数表格-->
           <el-table :data="manyTableData" border stripe>
-            <el-table-column type="expand"></el-table-column>
+            <el-table-column type="expand">
+              <template slot-scope="scope">
+                <!--渲染tag标签-->
+                <el-tag :key="i" v-for="(item,i) in scope.row.attr_vals" closable>
+                  {{item}}
+                </el-tag>
+                <!--动态编辑标签-->
+                <el-input class="input-new-tag" v-if="inputVisible" v-model="inputValue"
+                        ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm"
+                        @blur="handleInputConfirm">
+                </el-input>
+                <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
+              </template>
+            </el-table-column>
             <el-table-column type="index" label="#"></el-table-column>
             <el-table-column label="参数名称" prop="attr_name"></el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
                 <el-button type="primary" size="mini" icon="el-icon-edit" @click="editParams(scope.row.attr_id)">编辑</el-button>
-                <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteParams">删除</el-button>
+                <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteParams(scope.row.attr_id)">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -52,7 +65,7 @@
             <el-table-column label="操作">
               <template slot-scope="scope">
                 <el-button type="primary" size="mini" icon="el-icon-edit" @click="editParams(scope.row.attr_id)">编辑</el-button>
-                <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteParams">删除</el-button>
+                <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteParams(scope.row.attr_id)">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -135,7 +148,11 @@ export default {
         attr_name: [
           { required: true, message:'请输入参数名称', trigger: 'blur'}
         ]
-      }
+      },
+      //动态编辑标签的input和button的选择值
+      inputVisible:false,
+      //input绑定的值
+      inputValue:''
     }
   },
   computed:{
@@ -189,12 +206,16 @@ export default {
         return
       }
       //证明选中的是三级分类
-      console.log(this.selectCateKeys);
+      // console.log(this.selectCateKeys);
       //根据所选分类的id和所选择的面板，获取对应的参数
       const {data: res} = await this.$axios.get(`categories/${this.cateId}/attributes`, {params: {sel: this.activeName}})
       if (res.meta.status !== 200) {
         return this.$message.error('获取参数列表失败');
       }
+      console.log(res.data)
+      res.data.forEach(function (item) {
+        item.attr_vals = item.attr_vals ? item.attr_vals.split(' ') : []
+      })
       console.log(res.data)
       if (this.activeName === 'many') {
         this.manyTableData = res.data;
@@ -249,7 +270,7 @@ export default {
       })
     },
     //删除选择的参数数据
-    async deleteParams() {
+    async deleteParams(id) {
       const result = await this.$confirm('此操作将永久删除该参数，是否继续？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -260,13 +281,21 @@ export default {
         return this.$message.info('取消删除参数')
       }
       else {
-        const {data: res} = await this.$axios.delete(`categories/${this.cateId}/attributes/` + this.editForm.attr_id)
+        const {data: res} = await this.$axios.delete(`categories/${this.cateId}/attributes/` + id)
         if (res.meta.status !== 200) {
           return this.$message.error('删除操作失败')
         }
         this.$message.success('删除商品分类成功');
         await this.getParamsList();
       }
+    },
+    //无论是按下enter还是blur离开input都会触发此函数
+    handleInputConfirm() {
+
+    },
+    //el-tag后的button触发按钮
+    showInput() {
+      this.inputVisible = true;
     }
   }
 }
@@ -276,4 +305,11 @@ export default {
 .cat_opt {
   margin: 15px 0;
 }
+.el-tag {
+  margin: 5px;
+}
+  .input-new-tag {
+    width: 120px;
+    margin: 5px;
+  }
 </style>
