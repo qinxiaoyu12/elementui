@@ -59,7 +59,20 @@
           <el-button type="primary" size="mini" :disabled="isBtnDisabled" @click="addDialogVisible=true">添加属性</el-button>
           <!--静态属性表格-->
           <el-table :data="onlyTableData" border stripe>
-            <el-table-column type="expand"></el-table-column>
+            <el-table-column type="expand">
+              <template slot-scope="scope">
+                <!--渲染tag标签-->
+                <el-tag :key="i" v-for="(item,i) in scope.row.attr_vals" closable @close="deleteTag(i, scope.row)">
+                  {{item}}
+                </el-tag>
+                <!--动态编辑标签-->
+                <el-input class="input-new-tag" v-if="scope.row.inputVisible" v-model="scope.row.inputValue"
+                          ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm(scope.row)"
+                          @blur="handleInputConfirm(scope.row)">
+                </el-input>
+                <el-button v-else class="button-new-tag" size="small" @click="showInput(scope.row)">+ New Tag</el-button>
+              </template>
+            </el-table-column>
             <el-table-column type="index" label="#"></el-table-column>
             <el-table-column label="属性名称" prop="attr_name"></el-table-column>
             <el-table-column label="操作">
@@ -199,6 +212,8 @@ export default {
       //证明选中的不是三级分类
       if (this.selectCateKeys.length !== 3) {
         this.selectCateKeys = [];
+        this.manyTableData = [];
+        this.onlyTableData = [];
         return
       }
       //证明选中的是三级分类
