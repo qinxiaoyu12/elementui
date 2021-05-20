@@ -14,6 +14,16 @@ import TreeTable from 'vue-table-with-tree-grid'
 Vue.config.productionTip = false;
 Vue.component('tree-table', TreeTable)
 Vue.prototype.$confirm = MessageBox.confirm;
+Vue.filter('timeDateFilter', function (timeDate) {
+  let tt = new Date(timeDate * 1000);
+  let Y = tt.getFullYear() + '-';
+  let M = (tt.getMonth() + 1 < 10 ? '0' + (tt.getMonth() + 1) : tt.getMonth() + 1) + '-';
+  let D = tt.getDate() + ' ';
+  let h = tt.getHours() + ':';
+  let m = tt.getMinutes() + ':';
+  let s = tt.getSeconds();
+  return `${Y}${M}${D} ${h}${m}${s}`
+})
 
 // import API from "./request/api";
 Vue.prototype.$axios = axios;
