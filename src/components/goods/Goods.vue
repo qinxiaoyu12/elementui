@@ -129,7 +129,7 @@
             this.goodsParams.pagenum = newPageNum;
             this.getGoodsLists();
         },
-        //添加商品
+        //跳转到添加商品页面
         addGoods() {
             this.$router.push('/goods/add')
         },
