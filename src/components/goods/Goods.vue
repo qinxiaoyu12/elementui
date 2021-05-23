@@ -25,15 +25,15 @@
             <el-table :data="goodsList" stripe border style="width: 1200px;">
                 <el-table-column type="index" label="#"></el-table-column>
                 <el-table-column prop="goods_name" label="商品名称"></el-table-column>
-                <el-table-column prop="goods_price" label="商品价格(元)" width="100px"></el-table-column>
+                <el-table-column prop="goods_price" label="商品价格(元)" width="110px"></el-table-column>
                 <el-table-column prop="goods_weight" label="商品重量" width="70px"></el-table-column>
                 <el-table-column prop="goods_number" label="商品数量" width="70px"></el-table-column>
-                <el-table-column label="创建时间" width="120px">
+                <el-table-column label="创建时间" width="180px">
                     <template slot-scope="scope">
                         {{scope.row.add_time | timeDateFilter}}
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="180px">
+                <el-table-column label="操作" width="126px">
                     <template slot-scope="scope">
                         <el-button type="primary" size="mini" icon="el-icon-edit" @click="editGoods(scope.row.goods_id)"></el-button>
                         <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteGoods(scope.row.goods_id)"></el-button>
@@ -88,7 +88,13 @@
           goodsList:[],
           total:0,
           editGoodsDialogVisible:false,
-          editGoodsData:{},
+          editGoodsData:{
+            goods_name:'',
+            goods_price:'',
+            goods_weight:'',
+            goods_number:'',
+            goods_cat:''
+          },
           editGoodsDialogRules:{
               goods_name: [
                   { required: true, message:'请输入商品名称', trigger: 'blur'},
@@ -170,9 +176,11 @@
             this.$refs.editGoodsDialogFormRef.validate(async valid => {
                 if (!valid) return
                 //预校验为真，发送数据到数据库
-                const {data: res} = await this.$axios.put('goods/' + this.editGoodsData.id, {goods_name:this.editGoodsData.goods_name,
-                    goods_price:this.editGoodsData.goods_price, goods_number:this.editGoodsData.goods_number, goods_weight:this.editGoodsData.goods_weight
+                const {data: res} = await this.$axios.put('goods/' + this.editGoodsData.goods_id, {goods_name:this.editGoodsData.goods_name,
+                    goods_price:this.editGoodsData.goods_price, goods_number:this.editGoodsData.goods_number, goods_weight:this.editGoodsData.goods_weight, goods_cat:this.editGoodsData.goods_cat
                 , })
+              console.log(res);
+                console.log(this.editGoodsData.goods_id);
                 if (res.meta.status !== 200) {
                     return this.$message.error('发送到数据库失败')
                 } else {

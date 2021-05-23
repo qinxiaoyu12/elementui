@@ -36,3 +36,11 @@ html, body, #app {
 .el-cascader-panel .el-cascader-node__postfix {
     top: 10px;
 }
+
+.el-steps {
+    margin: 15px 0;
+}
+
+.el-step__title {
+    font-size: 13px;
+}
