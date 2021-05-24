@@ -25,8 +25,8 @@
 
           <!--左侧的竖向tab选择-->
           <el-form :model="addForm" :rules="addFormRules" ref="addFromRefs" label-width="100px" label-position="top">
-            <el-tabs v-model="activeIndex" @tab-click="handleClick" :tab-position="tabPosition">
-              <el-tab-pane label="基本信息" name="0" :before-leave="beforeLeave">
+            <el-tabs v-model="activeIndex" @tab-click="handleClick" :tab-position="tabPosition" :before-leave="beforeLeave">
+              <el-tab-pane label="基本信息" name="0">
                 <el-form-item label="商品名称" prop="goods_name">
                   <el-input v-model="addForm.goods_name"></el-input>
                 </el-form-item>
@@ -96,7 +96,8 @@
                   value:'cat_id',
                   children:'children',
                   expandTrigger: 'hover'
-              }
+              },
+              goodsParams:[]
             }
         },
       computed:{
@@ -109,8 +110,16 @@
       },
         methods: {
             //左侧的竖向tab选择所触发的函数
-            handleClick() {
-
+            async handleClick() {
+                //如果选中的tab标签页是商品参数这一页就获取商品参数列表数据
+                if (this.activeIndex === '1') {
+                    const {data: res} = await this.$axios.get(`categories/${this.cateId}/attributes`, {params:{sel:'many'}})
+                    if (res.meta.status !== 200) {
+                        return this.$message.error('获取商品参数列表数据失败')
+                    }
+                    this.goodsParams = res.data;
+                    console.log(this.goodsParams);
+                }
             },
           //页面也渲染就获取级联选择框的分类数据
           async getCateList() {
@@ -119,7 +128,7 @@
                 return this.$message.error('获取分类数据失败')
               }
               this.cateList = res.data;
-              console.log(this.cateList);
+              // console.log(this.cateList);
           },
           //级联选择器分类发生改变是所触发的函数
           handleChange() {
@@ -131,7 +140,7 @@
           //tab标签切换前后的activeIndex
           beforeLeave(activeName, oldActiveName) {
             if (oldActiveName === '0' && this.addForm.goods_cat.length !== 3) {
-              this.$message.error('请先选择三级分类');
+              this.$message.error('请先选择商品分类');
               return false
             }
           }
