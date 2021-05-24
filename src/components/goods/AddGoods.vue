@@ -45,7 +45,13 @@
                   ></el-cascader>
                 </el-form-item>
               </el-tab-pane>
-              <el-tab-pane label="商品参数" name="1">商品参数</el-tab-pane>
+              <el-tab-pane label="商品参数" name="1">
+                  <el-form-item :label="item.attr_name" v-for="item in goodsParams" :key="item.attr_id">
+                    <el-checkbox-group v-model="checkList">
+                      <el-checkbox label="复选框 A"></el-checkbox>
+                    </el-checkbox-group>
+                  </el-form-item>
+              </el-tab-pane>
               <el-tab-pane label="商品属性" name="2">商品属性</el-tab-pane>
               <el-tab-pane label="商品图片" name="3">商品图片</el-tab-pane>
               <el-tab-pane label="商品内容" name="4">商品内容</el-tab-pane>
@@ -97,7 +103,8 @@
                   children:'children',
                   expandTrigger: 'hover'
               },
-              goodsParams:[]
+              goodsParams:[],
+              onlyGoodsData:[]
             }
         },
       computed:{
@@ -115,10 +122,20 @@
                 if (this.activeIndex === '1') {
                     const {data: res} = await this.$axios.get(`categories/${this.cateId}/attributes`, {params:{sel:'many'}})
                     if (res.meta.status !== 200) {
-                        return this.$message.error('获取商品参数列表数据失败')
+                        return this.$message.error('获取商品动态参数列表数据失败')
                     }
+                    res.data.forEach(item => {
+                      item.attr_vals = item.attr_vals.length === 0 ? [] : item.attr_vals.join(' ');
+                      console.log(item.attr_vals)
+                    })
                     this.goodsParams = res.data;
                     console.log(this.goodsParams);
+                } else if (this.activeIndex === '2') {
+                  const {data: res} = await this.$axios.get(`categories/${this.cateId}/attributes`, {params:{sel:'only'}})
+                  if (res.meta.status !== 200) {
+                    return this.$message.error('获取商品静态属性列表数据失败')
+                  }
+                  this.onlyGoodsData = res.data;
                 }
             },
           //页面也渲染就获取级联选择框的分类数据
