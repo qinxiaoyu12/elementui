@@ -9,8 +9,13 @@ import 'element-ui/lib/theme-chalk/index.css';
 import axios from 'axios';
 import {MessageBox} from 'element-ui';
 import TreeTable from 'vue-table-with-tree-grid'
+import VueQuillEditor from 'vue-quill-editor'
+//全局导入富文本编辑器
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
 
-
+Vue.use(VueQuillEditor, /* { default global options } */)
 Vue.config.productionTip = false;
 Vue.component('tree-table', TreeTable)
 Vue.prototype.$confirm = MessageBox.confirm;

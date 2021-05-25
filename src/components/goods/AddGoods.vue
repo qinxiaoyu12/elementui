@@ -47,17 +47,36 @@
               </el-tab-pane>
               <el-tab-pane label="商品参数" name="1">
                   <el-form-item :label="item.attr_name" v-for="item in goodsParams" :key="item.attr_id">
-                    <el-checkbox-group v-model="checkList">
-                      <el-checkbox label="复选框 A"></el-checkbox>
+                    <el-checkbox-group v-model="item.attr_vals">
+                      <el-checkbox :label="cb" border v-for="(cb, i) in item.attr_vals" :key="i"></el-checkbox>
                     </el-checkbox-group>
                   </el-form-item>
               </el-tab-pane>
-              <el-tab-pane label="商品属性" name="2">商品属性</el-tab-pane>
-              <el-tab-pane label="商品图片" name="3">商品图片</el-tab-pane>
-              <el-tab-pane label="商品内容" name="4">商品内容</el-tab-pane>
+              <el-tab-pane label="商品属性" name="2">
+                  <el-form-item :label="item.attr_name" v-for="item in onlyGoodsData" :key="item.attr_id">
+                      <el-input v-model="item.attr_vals"></el-input>
+                  </el-form-item>
+              </el-tab-pane>
+              <el-tab-pane label="商品图片" name="3">
+                  <el-upload :action="uploadUrl" :on-success="uploadSuccess" :on-remove="removePic"
+                          :on-preview="handlePreview"
+                          list-type="picture" :headers="headersObj">
+                      <el-button size="small" type="primary">点击上传</el-button>
+                  </el-upload>
+              </el-tab-pane>
+              <el-tab-pane label="商品内容" name="4">
+                  <!--富文本编辑器-->
+                  <quill-editor v-model="addForm.goods_introduce"></quill-editor>
+                  <button type="primary" @click="addGoodsBtn" class="btnAdd">添加商品</button>
+              </el-tab-pane>
             </el-tabs>
           </el-form>
         </el-card>
+
+        //预览图片的dialog
+        <el-dialog title="预览图片" :visible.sync="previewDialogVisible" width="50%">
+            <img src="picPreviewPath" alt="" class="previewPic">
+        </el-dialog>
     </div>
 </template>
 
@@ -77,7 +96,9 @@
                   goods_price: 0,
                   goods_weight: 0,
                   goods_number:0,
-                  goods_cat:[]
+                  goods_cat:[],
+                  pics:[],
+                  goods_introduce:''
                 },
                 addFormRules:{
                   goods_name: [
@@ -104,7 +125,13 @@
                   expandTrigger: 'hover'
               },
               goodsParams:[],
-              onlyGoodsData:[]
+              onlyGoodsData:[],
+              uploadUrl: 'http://127.0.0.1:8888/api/private/v1/upload',
+              headersObj:{
+                  Authorization : window.sessionStorage.getItem('token')
+              },
+              previewDialogVisible:false,
+              picPreviewPath:''
             }
         },
       computed:{
@@ -125,17 +152,18 @@
                         return this.$message.error('获取商品动态参数列表数据失败')
                     }
                     res.data.forEach(item => {
-                      item.attr_vals = item.attr_vals.length === 0 ? [] : item.attr_vals.join(' ');
-                      console.log(item.attr_vals)
+                      item.attr_vals = item.attr_vals.length === 0 ? [] : item.attr_vals.split(' ')
+                      // console.log(item.attr_vals)
                     })
                     this.goodsParams = res.data;
-                    console.log(this.goodsParams);
+                    // console.log(this.goodsParams);
                 } else if (this.activeIndex === '2') {
                   const {data: res} = await this.$axios.get(`categories/${this.cateId}/attributes`, {params:{sel:'only'}})
                   if (res.meta.status !== 200) {
                     return this.$message.error('获取商品静态属性列表数据失败')
                   }
                   this.onlyGoodsData = res.data;
+                  // console.log(this.onlyGoodsData);
                 }
             },
           //页面也渲染就获取级联选择框的分类数据
@@ -160,11 +188,46 @@
               this.$message.error('请先选择商品分类');
               return false
             }
+          },
+          //图片预览触发函数
+          handlePreview(file) {
+              this.picPreviewPath = file.data.url;
+              this.previewDialogVisible = true;
+          },
+          //监听图片上传成功触发的函数
+          uploadSuccess(response) {
+              // console.log(response);
+              const pic = { pic:response.data.tmp_path }
+              this.addForm.pics.push(pic);
+              // console.log(this.addForm)
+          },
+          //删除图片触发事件
+          removePic(file) {
+              //1.获取将要删除图片的临时路径
+              const picTemPath = file.response.data.tmp_path;
+              //2.在pics数组中，找到对应图片的索引值
+              const i = this.addForm.pics.findIndex(x => x.pic === picTemPath)
+              //3.调用splice方法，移除图片信息
+              this.addForm.pics.splice(i, 1);
+          },
+          //添加商品btn
+          addGoodsBtn() {
+
           }
         }
     }
 </script>
 
 <style scoped>
+    .el-checkbox {
+        margin: 0 10px 0 0 !important;
+    }
 
+    .previewPic {
+        width: 100%;
+    }
+
+    .btnAdd {
+        margin-top: 15px;
+    }
 </style>
