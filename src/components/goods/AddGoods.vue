@@ -67,13 +67,13 @@
               <el-tab-pane label="商品内容" name="4">
                   <!--富文本编辑器-->
                   <quill-editor v-model="addForm.goods_introduce"></quill-editor>
-                  <button type="primary" @click="addGoodsBtn" class="btnAdd">添加商品</button>
+                  <el-button type="primary" @click="addGoodsBtn" class="btnAdd">添加商品</el-button>
               </el-tab-pane>
             </el-tabs>
           </el-form>
         </el-card>
 
-        //预览图片的dialog
+        <!--预览图片的dialog-->
         <el-dialog title="预览图片" :visible.sync="previewDialogVisible" width="50%">
             <img src="picPreviewPath" alt="" class="previewPic">
         </el-dialog>
@@ -81,6 +81,7 @@
 </template>
 
 <script>
+    import _ from 'lodash'
     export default {
         name: "User",
         created() {
@@ -98,7 +99,8 @@
                   goods_number:0,
                   goods_cat:[],
                   pics:[],
-                  goods_introduce:''
+                  goods_introduce:'',
+                  attrs:[]
                 },
                 addFormRules:{
                   goods_name: [
@@ -156,14 +158,14 @@
                       // console.log(item.attr_vals)
                     })
                     this.goodsParams = res.data;
-                    // console.log(this.goodsParams);
+                    console.log(this.goodsParams);
                 } else if (this.activeIndex === '2') {
                   const {data: res} = await this.$axios.get(`categories/${this.cateId}/attributes`, {params:{sel:'only'}})
                   if (res.meta.status !== 200) {
                     return this.$message.error('获取商品静态属性列表数据失败')
                   }
                   this.onlyGoodsData = res.data;
-                  // console.log(this.onlyGoodsData);
+                  console.log(this.onlyGoodsData);
                 }
             },
           //页面也渲染就获取级联选择框的分类数据
@@ -212,7 +214,20 @@
           },
           //添加商品btn
           addGoodsBtn() {
+            //表单预校验
+            this.$refs.addFromRefs.validate(valid => {
+              if (!valid) return this.$message.error('请填写必要的表单项！')
+              //执行添加的业务逻辑
+              //深拷贝loadash
+              const form = _.cloneDeep(this.addForm)
+              form.goods_cat = form.goods_cat.join(',')
+              console.log(form);
+              //attrs数据处理
+              this.goodsParams.forEach(item => {
+                // item.
+              })
 
+            })
           }
         }
     }
