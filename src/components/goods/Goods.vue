@@ -123,7 +123,7 @@
             // this.$message.success('获取商品列表数据成功')
             this.goodsList = res.data.goods;
             this.total = res.data.total;
-            console.log(this.goodsList)
+            // console.log(this.goodsList)
         },
         //改变分页的每一页所渲染数据量所触发的函数
         handleSizeChange(newPageSize) {
