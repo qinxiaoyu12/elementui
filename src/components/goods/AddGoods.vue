@@ -215,7 +215,7 @@
           //添加商品btn
           addGoodsBtn() {
             //表单预校验
-            this.$refs.addFromRefs.validate(valid => {
+            this.$refs.addFromRefs.validate( async valid => {
               if (!valid) return this.$message.error('请填写必要的表单项！')
               //执行添加的业务逻辑
               //深拷贝loadash
@@ -223,10 +223,25 @@
               form.goods_cat = form.goods_cat.join(',')
               console.log(form);
               //attrs数据处理
+              //动态数据处理
               this.goodsParams.forEach(item => {
-                // item.
+                const newInfo = {attr_id: item.attr_id, attr_value: item.attr_vals.join(' ')}
+                this.addForm.attrs.push(newInfo)
               })
-
+              //静态数据处理
+              this.onlyGoodsData.forEach(item => {
+                  const newInfo = {attr_id: item.attr_id, attr_value: item.attr_vals}
+                  this.addForm.attrs.push(newInfo)
+              })
+              form.attrs = this.addForm.attrs;
+              //发起添加商品请求
+              //商品名称必须是唯一的
+              const {data: res} = await this.$axios.post('goods', form)
+              if (res.meta.status !== 201) {
+                  return this.$message.error('发起添加商品请求失败')
+              }
+              this.$message.success('发起添加商品请求成功')
+              await this.$router.push('/goods');
             })
           }
         }
