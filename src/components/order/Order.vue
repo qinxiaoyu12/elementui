@@ -24,8 +24,8 @@
             <el-table-column prop="order_price" label="订单价格" width="200px"></el-table-column>
             <el-table-column prop="order_pay" label="是否付款" width="200px">
               <template slot-scope="scope">
-                <el-tag type="danger" effect="light" v-if="scope.row.order_pay !== 1">未付款</el-tag>
-                <el-tag type="danger" effect="light" v-else>付款</el-tag>
+                <el-tag type="danger" size="mini" effect="light" v-if="scope.row.pay_status === '0'">未付款</el-tag>
+                <el-tag type="success" size="mini" effect="light" v-else>已付款</el-tag>
               </template>
             </el-table-column>
             <el-table-column prop="is_send" label="是否发货" width="200px"></el-table-column>
@@ -47,6 +47,22 @@
                          :current-page="ordersParams.pagenum" :page-sizes="[1, 2, 5, 10]"
                          :page-size="ordersParams.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="total">
           </el-pagination>
+
+            <!--修改地址对话框-->
+            <el-dialog title="修改地址" :visible.sync="editAddressDialogVisible" width="50%" @close="editAddressDialogReset">
+                <el-form :model="addressData" :rules="editAddressDialogRules" ref="editGoodsDialogFormRef" label-width="140px">
+                    <el-form-item label="省市区/县">
+                        <el-input v-model="addressData.consignee_addr"></el-input>
+                    </el-form-item>
+                    <el-form-item label="详细地址" prop="goods_price">
+                        <el-input v-model="addressData.consignee_addr"></el-input>
+                    </el-form-item>
+                </el-form>
+                <span slot="footer" class="dialog-footer">
+          <el-button @click="editAddressDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="editGoodsAddress">确 定</el-button>
+          </span>
+            </el-dialog>
         </el-card>
     </div>
 </template>
@@ -65,7 +81,14 @@
                     pagesize:5
                 },
                 ordersList:[],
-                total:''
+                total:0,
+                editAddressDialogVisible:false,
+                addressData:{
+
+                },
+                editAddressDialogRules:{
+
+                }
             }
         },
         methods: {
@@ -78,9 +101,10 @@
                 // this.$message.success('获取orders列表数据请求成功')
                 this.ordersList = res.data.goods;
                 this.total = res.data.total;
-                console.log(this.ordersList)
+                // console.log(this.ordersList)
             },
           //修改地址
+          //根据行id获取货物地址信息
           editAddress() {
 
           },
@@ -97,6 +121,10 @@
           handleCurrentChange(newPage) {
             this.ordersParams.pagenum = newPage;
             this.getOrdersLists();
+          },
+          //确定修改的地址信息并上传数据库
+          editGoodsAddress() {
+
           }
         }
     }

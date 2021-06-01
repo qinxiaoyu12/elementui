@@ -22,11 +22,11 @@ Vue.prototype.$confirm = MessageBox.confirm;
 Vue.filter('timeDateFilter', function (timeDate) {
   let tt = new Date(timeDate * 1000);
   let Y = tt.getFullYear() + '-';
-  let M = (tt.getMonth() + 1 < 10 ? '0' + (tt.getMonth() + 1) : tt.getMonth() + 1) + '-';
-  let D = tt.getDate() + ' ';
-  let h = tt.getHours() + ':';
-  let m = tt.getMinutes() + ':';
-  let s = tt.getSeconds();
+  let M = ((tt.getMonth() + 1 < 10 ? '0' + (tt.getMonth() + 1) : tt.getMonth() + 1) + '').padStart(2, '0') + '-';
+  let D = ((tt.getDate() + '').padStart(2, '0')) + ' ';
+  let h = ((tt.getHours() + '').padStart(2, '0')) + ':';
+  let m = ((tt.getMinutes() + '').padStart(2, '0')) + ':';
+  let s = (tt.getSeconds() + '').padStart(2, '0');
   return `${Y}${M}${D} ${h}${m}${s}`
 })
 
