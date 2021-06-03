@@ -36,8 +36,8 @@
             </el-table-column>
             <el-table-column label="操作">
                 <template slot-scope="scope">
-                    <el-button type="primary" size="mini" icon="el-icon-edit" @click="editAddress(scope.row.goods_id)"></el-button>
-                    <el-button type="success" size="mini" icon="el-icon-location" @click="ordersStatus(scope.row.goods_id)"></el-button>
+                    <el-button type="primary" size="mini" icon="el-icon-edit" @click="editAddress"></el-button>
+                    <el-button type="success" size="mini" icon="el-icon-location" @click="ordersStatus"></el-button>
                 </template>
             </el-table-column>
             </el-table>
@@ -50,12 +50,16 @@
 
             <!--修改地址对话框-->
             <el-dialog title="修改地址" :visible.sync="editAddressDialogVisible" width="50%" @close="editAddressDialogReset">
-                <el-form :model="addressData" :rules="editAddressDialogRules" ref="editGoodsDialogFormRef" label-width="140px">
-                    <el-form-item label="省市区/县">
-                        <el-input v-model="addressData.consignee_addr"></el-input>
+                <el-form :model="addressData" :rules="editAddressDialogRules" ref="editAddressDialogFormRef" label-width="140px">
+                      <el-form-item label="省市区/县" prop="address1">
+                        <el-cascader ref="handleRef" clearable
+                                     v-model="addressData.address1"
+                                     :options="citydata"
+                                     :props="props"
+                                     ></el-cascader>
                     </el-form-item>
-                    <el-form-item label="详细地址" prop="goods_price">
-                        <el-input v-model="addressData.consignee_addr"></el-input>
+                    <el-form-item label="详细地址" prop="address2">
+                        <el-input v-model="addressData.address2"></el-input>
                     </el-form-item>
                 </el-form>
                 <span slot="footer" class="dialog-footer">
@@ -63,11 +67,25 @@
           <el-button type="primary" @click="editGoodsAddress">确 定</el-button>
           </span>
             </el-dialog>
+
+          <!--显示物流信息的对话框-->
+          <el-dialog title="物流进度" :visible.sync="orderInfoDialogVisible" width="50%">
+            <el-timeline>
+              <el-timeline-item
+                  v-for="(item, index) in progressInfo"
+                  :key="index"
+                  :timestamp="item.ftime">
+                {{item.context}}
+              </el-timeline-item>
+            </el-timeline>
+          </el-dialog>
         </el-card>
     </div>
 </template>
 
 <script>
+    import citydata from "@/components/order/citydata";
+    import progressInfo from "./progressInfo.json";
     export default {
         name: "",
         created() {
@@ -84,11 +102,24 @@
                 total:0,
                 editAddressDialogVisible:false,
                 addressData:{
-
+                  address1:[],
+                  address2:''
                 },
                 editAddressDialogRules:{
-
-                }
+                  address1: [
+                    { required: true, message:'请输入省市县区', trigger: 'blur'}
+                  ],
+                  address2: [
+                    { required: true, message:'请输入详细地址', trigger: 'blur'}
+                  ],
+                },
+                citydata,
+                orderInfoDialogVisible:false,
+                props:{
+                expandTrigger: 'hover'
+              },
+              ordersLists:[],
+              progressInfo:progressInfo.data
             }
         },
         methods: {
@@ -106,11 +137,11 @@
           //修改地址
           //根据行id获取货物地址信息
           editAddress() {
-
+              this.editAddressDialogVisible = true;
           },
           //查看订单物流状态
-          ordersStatus() {
-
+          async ordersStatus() {
+             this.orderInfoDialogVisible = true;
           },
           //每一页的数据多少触发的函数
           handleSizeChange(newSize) {
@@ -125,6 +156,10 @@
           //确定修改的地址信息并上传数据库
           editGoodsAddress() {
 
+          },
+          //修改地址dialog关闭后表单重置
+          editAddressDialogReset() {
+              this.$refs.editAddressDialogFormRef.resetFields();
           }
         }
     }
@@ -133,5 +168,8 @@
 <style scoped>
   .pageInation {
     margin-top: 15px;
+  }
+  .el-cascader {
+    width: 100%;
   }
 </style>
