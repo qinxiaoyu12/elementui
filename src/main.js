@@ -15,6 +15,10 @@ import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 
+//导入进度条
+import NProgress from 'nprogress' // 引入nprogress插件
+import 'nprogress/nprogress.css'  // 这个nprogress样式必须引入
+
 Vue.use(VueQuillEditor, /* { default global options } */)
 Vue.config.productionTip = false;
 Vue.component('tree-table', TreeTable)
@@ -35,9 +39,15 @@ Vue.prototype.$axios = axios;
 axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
 // Vue.prototype.$API = API;
 axios.interceptors.request.use(config => {
+  NProgress.start();
   // console.log(config);
   //在发送请求之前做些什么
    config.headers.Authorization = window.sessionStorage.getItem('token');
+  return config;
+})
+
+axios.interceptors.response.use(config => {
+  NProgress.done();
   return config;
 })
 Vue.use(ElementUI);
