@@ -50,9 +50,8 @@ axios.interceptors.response.use(config => {
   NProgress.done();
   return config;
 })
+
 Vue.use(ElementUI);
-
-
 
 new Vue({
   el: '#app',

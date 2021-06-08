@@ -26,10 +26,11 @@
 </template>
 
 <script>
-    import router from "@/router";
-
     export default {
         name: "Login",
+        components:{
+
+        },
         data() {
             return {
                 loginFrom:{

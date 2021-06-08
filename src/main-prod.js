@@ -4,8 +4,8 @@ import router from './router';
 import store from './store';
 import global from './assets/css/global.css';
 import './assets/fonts/iconfont.css'
-// import ElementUI from 'element-ui';
-// import 'element-ui/lib/theme-chalk/index.css';
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
 import axios from 'axios';
 import {MessageBox} from 'element-ui';
 import TreeTable from 'vue-table-with-tree-grid'
@@ -50,9 +50,8 @@ axios.interceptors.response.use(config => {
     NProgress.done();
     return config;
 })
+
 Vue.use(ElementUI);
-
-
 
 new Vue({
     el: '#app',
